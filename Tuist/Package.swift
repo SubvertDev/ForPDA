@@ -29,7 +29,6 @@ import PackageDescription
             "SwiftUINavigation": .framework,
             "UIKitNavigation": .framework,
             "UIKitNavigationShim": .framework,
-            "XCTestDynamicOverlay": .framework,
             
             "Nuke": .framework,
             "NukeUI": .framework,
@@ -82,7 +81,8 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/swift-sharing", exact: "2.10.1"),
 //        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", exact: "1.19.4"),
 //        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", exact: "1.11.0"),
-        .package(url: "https://github.com/pointfreeco/swift-issue-reporting", exact: "2.1.0"),
+        .package(url: "https://github.com/pointfreeco/swift-issue-reporting", exact: "2.1.1"),
+        .package(url: "https://github.com/pointfreeco/combine-schedulers", exact: "1.2.2"), // hotfix for IssueReporting
 
         // Other
         .package(url: "https://github.com/CSolanaM/SkeletonUI", exact: "2.0.2"),

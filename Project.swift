@@ -709,7 +709,6 @@ let project = Project(
                 name: "UserPunishmentFeature",
                 dependencies: [
                     .Internal.APIClient,
-                    .Internal.BBPanelFeature,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .SPM.SFSafeSymbols,
