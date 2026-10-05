@@ -541,11 +541,6 @@ public struct ForumScreen: View {
                 }
                 
                 ToolbarItem {
-                    let isMenuDisabled = if store.multiSelectionMode == .pinnedTopics {
-                        store.selectedTopicsPinned.isEmpty
-                    } else {
-                        store.selectedTopics.isEmpty
-                    }
                     Menu {
                         let isPinned = store.multiSelectionMode == .pinnedTopics
                         TopicToolsContextMenu(
@@ -555,9 +550,11 @@ public struct ForumScreen: View {
                         )
                     } label: {
                         Image(systemSymbol: .ellipsisCircle)
-                            .foregroundStyle(isMenuDisabled ? AnyShapeStyle(Color(.Labels.teritary)) : foregroundStyle())
+                            .foregroundStyle(
+                                store.isMultiSelectionMenuDisabled ? AnyShapeStyle(Color(.Labels.teritary)) : foregroundStyle()
+                            )
                     }
-                    .disabled(isMenuDisabled)
+                    .disabled(store.isMultiSelectionMenuDisabled)
                 }
             }
         }
@@ -619,12 +616,12 @@ struct NavigationModifier: ViewModifier {
     
     private func navigationTitleText() -> String {
         if let mode = store.multiSelectionMode {
-            guard !store.selectedTopics.isEmpty || !store.selectedTopicsPinned.isEmpty else {
-                return String(localized: "Select topics", bundle: .module)
-            }
             let count = switch mode {
             case .topics: store.selectedTopics.count
             case .pinnedTopics: store.selectedTopicsPinned.count
+            }
+            guard count > 1 else {
+                return String(localized: "Select topics", bundle: .module)
             }
             return String(localized: "Topics selected \(count)", bundle: .module)
         }

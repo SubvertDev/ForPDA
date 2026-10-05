@@ -124,6 +124,14 @@ public struct ForumFeature: Reducer, Sendable {
             return multiSelectionMode != nil
         }
         
+        public var isMultiSelectionMenuDisabled: Bool {
+            if multiSelectionMode == .pinnedTopics {
+                selectedTopicsPinned.count < 2
+            } else {
+                selectedTopics.count < 2
+            }
+        }
+        
         public init(
             forumId: Int,
             forumName: String? = nil,
