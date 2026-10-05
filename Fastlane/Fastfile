@@ -42,6 +42,8 @@ platform :ios do
             release: { desctiption: "Release channel: beta or stable", default: "beta" }   
         })
         
+        sh("tuist auth whoami")
+        
         setup_ci if ENV['CI']
         
         release_channel = (options[:release] || "beta").capitalize
@@ -74,6 +76,8 @@ platform :ios do
             build_number: { description: "Sets specific build number" },
             release: { desctiption: "Release channel: beta or stable", default: "beta" }   
         })
+        
+        sh("tuist auth whoami")
         
         setup_ci if ENV['CI']
         
