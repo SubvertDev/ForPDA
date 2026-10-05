@@ -345,7 +345,7 @@ public struct ForumScreen: View {
             if case .multi = topicId {
                 ContextButton(
                     text: LocalizedStringResource("Remove Hide", bundle: .module),
-                    symbol: .eyeSlashFill
+                    symbol: .eyeFill
                 ) {
                     send(.contextTopicToolsMenu(.modify(.hide, true), topicId))
                 }
@@ -363,7 +363,7 @@ public struct ForumScreen: View {
             if case .multi = topicId {
                 ContextButton(
                     text: LocalizedStringResource("Open", bundle: .module),
-                    symbol: .lockFill
+                    symbol: .lockOpenFill
                 ) {
                     send(.contextTopicToolsMenu(.modify(.close, true), topicId))
                 }
