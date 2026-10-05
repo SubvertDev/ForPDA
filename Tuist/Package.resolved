@@ -1,5 +1,5 @@
 {
-  "originHash" : "7f5d32dabbfc9df0940567a24756d6a2e271cafa6ea66c748fab0f79d874115b",
+  "originHash" : "f728f13749d03a39e69457ffb1cb3611b5ca7a3337373423baba0f90dfc537f1",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SubvertDev/PDAPI_SPM",
       "state" : {
-        "revision" : "86d8932bcf77aa7456d96fa0d1e5dff03a7f9b53",
-        "version" : "0.8.7"
+        "revision" : "7ef371a700962cfcc83373ed64bd67605bd24f2d",
+        "version" : "0.8.8"
       }
     },
     {
@@ -314,6 +314,15 @@
       "state" : {
         "revision" : "4430cbc148baa3907651d40562d96325426f409a",
         "version" : "5.4.5"
+      }
+    },
+    {
+      "identity" : "xctest-dynamic-overlay",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
+      "state" : {
+        "revision" : "d9308ad679143c26a30dec52daefe82f54af2b82",
+        "version" : "1.13.1"
       }
     },
     {
