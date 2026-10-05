@@ -407,7 +407,7 @@ extension APIClient: DependencyKey {
             },
             
             markRead: { id, isTopic in
-                let command = ForumCommand.markRead(id: id, isTopic: isTopic)
+                let command = ForumCommand.markRead(ids: [id], isTopics: isTopic)
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
@@ -477,8 +477,8 @@ extension APIClient: DependencyKey {
                 return try await parser.parseTopicViewers(response)
             },
             setTopicCurator: { topicId, userId, reason in
-                let command = ForumCommand.Topic.setCurator(
-                    topicId: topicId,
+                let command = ForumCommand.Topic.curator(
+                    topicIds: [topicId],
                     memberId: userId,
                     reason: reason
                 )
@@ -611,7 +611,7 @@ extension APIClient: DependencyKey {
             
             setFavorite: { request in
                 let command = MemberCommand.Favorites.modify(
-                    id: request.id,
+                    ids: [request.id],
                     type: request.transferType,
                     action: request.transferAction
                 )
