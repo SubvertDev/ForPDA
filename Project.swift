@@ -321,6 +321,7 @@ let project = Project(
                     .Internal.ToastClient,
                     .Internal.TopicEditFeature,
                     .Internal.FormFeature,
+                    .Internal.ForumMergeFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
                     .SPM.NukeUI,
@@ -338,6 +339,17 @@ let project = Project(
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
+                    .SPM.TCA,
+                ]
+            ),
+
+            .feature(
+                name: "ForumMergeFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.ToastClient,
                     .SPM.TCA,
                 ]
             ),
@@ -1288,6 +1300,7 @@ extension TargetDependency.Internal {
     static let ForumEventLogFeature =   TargetDependency.target(name: "ForumEventLogFeature")
     static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
     static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
+    static let ForumMergeFeature =      TargetDependency.target(name: "ForumMergeFeature")
     static let ForumMoveFeature =       TargetDependency.target(name: "ForumMoveFeature")
     static let ForumStatFeature =       TargetDependency.target(name: "ForumStatFeature")
     static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
