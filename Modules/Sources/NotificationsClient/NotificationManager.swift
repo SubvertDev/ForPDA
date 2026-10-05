@@ -61,6 +61,11 @@ public final class NotificationManager: @unchecked Sendable {
     }
     
     public func handleLocalNotifications(items: [PDANotification], context: NotificationContext?) async {
+        guard await canScheduleNotifications() else {
+            logger.warning("Skipping local notifications: not authorized")
+            return
+        }
+        
         for item in items {
             do {
                 let notification = try item.toDomain()
@@ -326,8 +331,26 @@ public final class NotificationManager: @unchecked Sendable {
         
         do {
             try await center.add(request)
+        } catch let error as UNError where error.code == .notificationsNotAllowed {
+            logger.warning("Local notification was not scheduled: not authorized")
         } catch {
             analytics.capture(error)
+            logger.error("Failed to schedule local notification: \(error)")
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    private func canScheduleNotifications() async -> Bool {
+        switch await center.notificationSettings().authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            return true
+
+        case .denied, .notDetermined:
+            return false
+
+        @unknown default:
+            return false
         }
     }
 }

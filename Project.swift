@@ -9,7 +9,7 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: App.bundleId,
-            deploymentTargets: .iOS("16.4"),
+            deploymentTargets: App.deploymentTargets,
             infoPlist: .main,
             sources: ["Modules/App/**"],
             resources: ["Modules/Resources/**"],
@@ -721,7 +721,6 @@ let project = Project(
                 name: "UserPunishmentFeature",
                 dependencies: [
                     .Internal.APIClient,
-                    .Internal.BBPanelFeature,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .SPM.SFSafeSymbols,
@@ -922,7 +921,7 @@ let project = Project(
 //                destinations: .iOS,
 //                product: .unitTests,
 //                bundleId: "com.subvert.forpda.tests",
-//                deploymentTargets: .iOS("16.4"),
+//                deploymentTargets: App.deploymentTargets,
 //                infoPlist: .default,
 //                sources: ["Modules/Tests/ForPDATests/**"],
 //                resources: [],
@@ -962,7 +961,7 @@ let project = Project(
                 destinations: .iOS,
                 product: .appExtension,
                 bundleId: App.bundleId + "." + "safariextension",
-                deploymentTargets: .iOS("16.4"),
+                deploymentTargets: App.deploymentTargets,
                 infoPlist: .safariExtension,
                 sources: ["Extensions/Safari/**"],
                 resources: [
@@ -995,7 +994,7 @@ let project = Project(
                 destinations: .iOS,
                 product: .appExtension,
                 bundleId: App.bundleId + "." + "nse",
-                deploymentTargets: .iOS("16.4"),
+                deploymentTargets: App.deploymentTargets,
                 infoPlist: .notificationServiceExtension,
                 sources: ["Extensions/NotificationService/**"],
                 resources: ["Extensions/NotificationService/Resources/**"],
@@ -1031,8 +1030,9 @@ let project = Project(
 
 struct App {
     static let name = "ForPDA"
-    static let destinations: ProjectDescription.Destinations = .iOS
+    static let destinations: Destinations = .iOS
     static let bundleId = "com.subvert.forpda"
+    static let deploymentTargets: DeploymentTargets = .iOS("16.0")
 }
 
 extension ProjectDescription.Target {
@@ -1070,7 +1070,7 @@ extension ProjectDescription.Target {
             destinations: App.destinations,
             product: productType,
             bundleId: App.bundleId + "." + name,
-            deploymentTargets: .iOS("16.4"),
+            deploymentTargets: App.deploymentTargets,
             infoPlist: infoPlist,
             sources: sources,
             resources: .resources(resources),
@@ -1094,7 +1094,7 @@ extension ProjectDescription.Target {
             destinations: App.destinations,
             product: .unitTests,
             bundleId: App.bundleId + "." + name + ".Tests",
-            deploymentTargets: .iOS("16.4"),
+            deploymentTargets: App.deploymentTargets,
             infoPlist: .default,
             sources: ["Modules/Sources/\(name)/Tests/**"],
             // resources: ["Modules/Resources/**"],

@@ -424,7 +424,11 @@ struct FormFeatureTests {
             placeholder: "",
             flag: [.required, .uploadable],
             defaultText: "",
-            uploadBox: .init(id: 6, allowedExtensions: ["apk", "apks", "exe", "zip", "rar", "obb", "7z", "r00", "r01", "apkm", "ipa"])
+            uploadBox: .init(
+                id: 6,
+                allowedExtensions: ["apk", "apks", "exe", "zip", "rar", "obb", "7z", "r00", "r01", "apkm", "ipa"],
+                requiresAttachment: true
+            )
         )
         var uploadbox = FormUploadBoxFeature.State(
             id: 6,

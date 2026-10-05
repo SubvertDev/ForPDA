@@ -504,6 +504,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(title))
                 ._toolbarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden(store.destination != nil)
                 .alert($store.scope(\.$destination, action: \.destination).alert)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
@@ -598,10 +599,10 @@ struct NavigationModifier: ViewModifier {
                 .sheet(item: $store.scope(\.$destination, action: \.destination).newPost) { store in
                     NavigationStack {
                         FormScreen(store: store)
-                            .scrollBounceBehavior(.basedOnSize)
+                            .backport.scrollBounceBehavior(.basedOnSize)
                     }
                     .presentationDetents([.medium, .large])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .backport.presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
         }
     }

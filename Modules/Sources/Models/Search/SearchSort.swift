@@ -5,11 +5,19 @@
 //  Created by Xialtal on 25.11.25.
 //
 
-public enum SearchSort: String, Sendable, Equatable, Codable {
+public enum SearchSort: Sendable, Equatable, Codable {
     
-    case dateDescSort = "dd"
-    case dateAscSort  = "da"
-    case relevance    = ""
+    case dateDescSort
+    case dateAscSort
+    case relevance
+    
+    public var rawValue: String {
+        switch self {
+        case .dateDescSort: "dd"
+        case .dateAscSort:  "da"
+        case .relevance:    ""
+        }
+    }
     
     var _rawValue: String {
         switch self {

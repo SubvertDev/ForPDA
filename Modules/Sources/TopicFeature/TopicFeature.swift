@@ -513,7 +513,7 @@ public struct TopicFeature: Reducer, Sendable {
                 case let .reply(postId, authorName):
                     let reply = "[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], "
                     let draft = state.postDraftsCache.topics[state.topicId] ?? ""
-                    let text = draft + reply
+                    let text = draft.contains(reply) ? draft : draft + reply
                     state.$postDraftsCache.withLock { $0.topics[state.topicId] = text }
                     let formState = FormFeature.State(
                         type: .post(
