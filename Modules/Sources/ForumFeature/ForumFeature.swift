@@ -17,6 +17,7 @@ import TCAExtensions
 import ToastClient
 import FormFeature
 import ForumStatFeature
+import ForumMergeFeature
 import ForumMoveFeature
 import TopicEditFeature
 import NotificationsClient
@@ -72,6 +73,7 @@ public struct ForumFeature: Reducer, Sendable {
         case move(ForumMoveFeature)
 		case stat(ForumStatFeature)
         case edit(TopicEditFeature)
+        case merge(ForumMergeFeature)
         
         @CasePathable
         public enum Action {
@@ -80,6 +82,7 @@ public struct ForumFeature: Reducer, Sendable {
             case move(ForumMoveFeature.Action)
             case stat(ForumStatFeature.Action)
             case edit(TopicEditFeature.Action)
+            case merge(ForumMergeFeature.Action)
         }
         
         @CasePathable
@@ -216,6 +219,9 @@ public struct ForumFeature: Reducer, Sendable {
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
                 
+            case let .destination(.presented(.merge(.delegate(.openTopic(id))))):
+                return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
             case let .destination(.presented(.move(.delegate(.openForum(id))))):
                 return .run { send in
                     await toastClient.showToast(ToastMessage(text: Localization.topicMoved, haptic: .success))
@@ -348,6 +354,7 @@ public struct ForumFeature: Reducer, Sendable {
                     return .none
                     
                 case .merge:
+                    state.destination = .merge(ForumMergeFeature.State(type: .topics(topics)))
                     return .none
                     
                 case .modify(let action, let isUndo):

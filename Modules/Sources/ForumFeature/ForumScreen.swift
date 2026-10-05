@@ -14,6 +14,7 @@ import Models
 import BBBuilder
 import FormFeature
 import ForumStatFeature
+import ForumMergeFeature
 import ForumMoveFeature
 import TopicEditFeature
 
@@ -667,6 +668,11 @@ struct NavigationModifier: ViewModifier {
                     .sheet(item: $store.scope(\.$destination, action: \.destination).edit) { store in
                         NavigationStack {
                             TopicEditView(store: store)
+                        }
+                    }
+                    .sheet(item: $store.scope(\.$destination, action: \.destination).merge) { store in
+                        NavigationStack {
+                            ForumMergeView(store: store)
                         }
                     }
                     .fittedSheet(
