@@ -291,7 +291,8 @@ public struct ForumScreen: View {
             }
             
             WithPerceptionTracking {
-                if let forum = store.forum, forum.canModerate {
+                let isSelectAvailable = topic.isPinned ? store.topicsPinned.count > 1 : store.topics.count > 1
+                if let forum = store.forum, forum.canModerate, isSelectAvailable {
                     Section {
                         ContextButton(text: LocalizedStringResource("Select", bundle: .module), symbol: .checkmarkCircle) {
                             send(.contextTopicMenu(.select, topic))
