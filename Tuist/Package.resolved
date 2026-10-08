@@ -1,5 +1,5 @@
 {
-  "originHash" : "7f5d32dabbfc9df0940567a24756d6a2e271cafa6ea66c748fab0f79d874115b",
+  "originHash" : "cc8eb172735038047e1d52c687d70af2c611289caca6485efec6c0bdf734415a",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "2a40ee24aebdb4d77525c5f547b61692c8ef87a9",
-        "version" : "3.74.0"
+        "revision" : "4642df21b8f4d16dbffcdfe92dbfe97f80b946fc",
+        "version" : "3.90.1"
       }
     },
     {
@@ -132,8 +132,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa",
       "state" : {
-        "revision" : "61e8cb02434b26fb34c58126d883e5663cfde238",
-        "version" : "9.28.0"
+        "revision" : "b539e098293067be54fa5cf1f11d9e16cdbba94a",
+        "version" : "9.30.0"
       }
     },
     {
@@ -330,8 +330,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ZhgChgLi/ZMarkupParser",
       "state" : {
-        "revision" : "f25c9838e9e77ae49cc3f434ee26e669cb4043c7",
-        "version" : "1.12.0"
+        "revision" : "904c70f5d5d33080a016cca9258eff778199d57e",
+        "version" : "2.0.2"
       }
     },
     {
@@ -339,8 +339,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ZhgChgLi/ZNSTextAttachment",
       "state" : {
-        "revision" : "8c6c34e82eb31ad373b209cb88c2a2aff76c6cdf",
-        "version" : "1.1.9"
+        "revision" : "91f718caf50649d817f189eb17ad028f03fd632b",
+        "version" : "1.2.0"
       }
     }
   ],
