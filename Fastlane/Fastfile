@@ -67,7 +67,7 @@ platform :ios do
         unless ENV['CI']
             run_tuist(testflight: false)
         end
-        bump_and_tag
+        bump_and_tag(release: options[:release])
     end
     
     desc "One-off upload to TF without tests/notify/bump"
@@ -316,13 +316,15 @@ platform :ios do
         )
     end
     
-    desc "Commits changes and adds a tag with version/build"
-    lane :bump_and_tag do
-        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
-        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
-        sh("git commit -a -m \"Bump version\"")
-        sh("git tag v#{version}-#{build}-beta")
-    end
+	desc "Commits changes and adds a tag with version/build"
+	lane :bump_and_tag do |options|
+    	version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+    	build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
+    	release = options[:release] || "beta"
+
+    	sh('git commit -a -m "Bump version"')
+    	sh("git tag v#{version}#{release == "beta" ? "-#{build}-beta" : ""}")
+	end
     
     # --------------------------------------------------
 
