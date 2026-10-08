@@ -251,8 +251,10 @@ public struct SettingsScreen: View {
                 store.send(.navigationButtonTapped)
             }
             
-            Row(symbol: .bell, title: "Notifications", type: .navigation) {
-                store.send(.notificationsButtonTapped)
+            if store.isUserAuthorized {
+                Row(symbol: .bell, title: "Notifications", type: .navigation) {
+                    store.send(.notificationsButtonTapped)
+                }
             }
             
             Row(symbol: .globe, title: "Language", type: .navigation) {

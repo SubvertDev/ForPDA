@@ -26,6 +26,9 @@ import ForumStatFeature
 import ForumMoveFeature
 import GalleryFeature
 import TopicEditFeature
+import OSLog
+import CacheClient
+import UserPunishmentFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -47,6 +50,7 @@ public struct TopicFeature: Reducer, Sendable {
         static let postRestored = LocalizedStringResource("Post restored", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
         static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
+        static let punishmentApplied = LocalizedStringResource("Punishment applied", bundle: .module)
         static let showingNearestPost = LocalizedStringResource("The post has been deleted, showing the nearest one", bundle: .module)
     }
     
@@ -61,20 +65,24 @@ public struct TopicFeature: Reducer, Sendable {
         @ReducerCaseIgnored
         case karmaChange(Int)
         case karmaHistory(PostKarmaHistoryFeature)
-        case form(FormFeature)
+        case newPost(FormFeature)
+        case template(FormFeature)
         case stat(ForumStatFeature)
         case move(ForumMoveFeature)
         case edit(TopicEditFeature)
+        case punish(UserPunishmentFeature)
         case changeReputation(ReputationChangeFeature)
         
         @CasePathable
         public enum Action {
             case alert(Alert)
             case karmaHistory(PostKarmaHistoryFeature.Action)
-            case form(FormFeature.Action)
+            case newPost(FormFeature.Action)
+            case template(FormFeature.Action)
             case stat(ForumStatFeature.Action)
             case move(ForumMoveFeature.Action)
             case edit(TopicEditFeature.Action)
+            case punish(UserPunishmentFeature.Action)
             case changeReputation(ReputationChangeFeature.Action)
         }
         
@@ -90,6 +98,7 @@ public struct TopicFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.postDraftsCache) var postDraftsCache: PostDraftsCache
         @Shared(.userSession) var userSession: UserSession?
         var userSessionInfo: User?
         
@@ -117,7 +126,10 @@ public struct TopicFeature: Reducer, Sendable {
             return userSession != nil
         }
         
-        var shouldShowTopicHatButton = false
+        var isTopicHatExpanded = false
+        var shouldShowTopicHatButton: Bool {
+            !pageNavigation.isFirstPage && !isTopicHatExpanded
+        }
         var shouldShowTopicPollButton = true
         
         public init(
@@ -183,8 +195,10 @@ public struct TopicFeature: Reducer, Sendable {
             case loadTopic(Int)
             case loadTypes([[UITopicType]])
             case topicResponse(Result<Topic, any Error>)
+            case topicNavigationUpdated(Topic)
             case setFavoriteResponse(Bool)
             case jumpRequestFailed
+            case cachePostDraft
             
             case initUserSessionInfo(User)
         }
@@ -232,20 +246,48 @@ public struct TopicFeature: Reducer, Sendable {
             switch action {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isRefreshing = false
+                state.isTopicHatExpanded = false
                 state.postId = nil
                 state.posts.removeAll()
                 return .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] send in
                     if isLastPage {
-                        await cacheClient.deleteTopicIdOfUnreadItem(topicId)
+                        @Shared(.notificationsCache) var notificationsCache
+                        _ = $notificationsCache.withLock { $0.topics.removeValue(forKey: topicId) }
                     }
                     Task.cancel(id: CancelID.loading)
                     await send(.internal(.loadTopic(newOffset)))
                 }
                 
-            case let .destination(.presented(.form(.delegate(.formSent(.post(post)))))):
+            case let .destination(.presented(.newPost(.delegate(.formSent(.post(post)))))):
+                let topicId = state.topicId
+                _ = state.$postDraftsCache.withLock { $0.topics.removeValue(forKey: topicId) }
                 return jumpTo(.post(id: post.id), true, &state)
+
+            case let .destination(.presented(.template(.delegate(.formSent(.post(post)))))):
+                return jumpTo(.post(id: post.id), true, &state)
+
+            case .destination(.presented(.newPost(.rows(.element(
+                id: _,
+                action: .editor(.binding(\.text))
+            ))))):
+                return .send(.internal(.cachePostDraft))
+
+            case .internal(.cachePostDraft):
+                guard case let .newPost(form) = state.destination,
+                      form.isNewSimplePost,
+                      case let .editor(editor) = form.rows.first
+                else { return .none }
+                let topicId = state.topicId
+                state.$postDraftsCache.withLock { cache in
+                    if editor.text.isEmpty {
+                        cache.topics.removeValue(forKey: topicId)
+                    } else {
+                        cache.topics[topicId] = editor.text
+                    }
+                }
+                return .none
                 
-            case .destination(.presented(.form(.delegate(.formSent(.report))))):
+            case .destination(.presented(.newPost(.delegate(.formSent(.report))))):
                 return .run { _ in
                     await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
@@ -266,6 +308,12 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case .destination(.presented(.stat(.delegate(.topicHistoryTapped)))):
                 return .send(.delegate(.openEventLog(state.topicId, .topic)))
+                
+            case .destination(.presented(.punish(.delegate(.punishmentApplied)))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.punishmentApplied, haptic: .success))
+                    await send(.internal(.refresh))
+                }
                 
             case let .destination(.presented(.karmaHistory(.delegate(.openUser(id))))):
                 return .send(.delegate(.openUser(id: id)))
@@ -333,7 +381,7 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
                 let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
                 state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { UIPost.Content(value: $0) })
-                state.shouldShowTopicHatButton = false
+                state.isTopicHatExpanded = true
                 return .none
                 
             case .view(.topicPollOpenButtonTapped):
@@ -356,14 +404,15 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let topic = state.topic else { return .none }
                 switch action {
                 case .writePost:
+                    let draft = state.postDraftsCache.topics[topic.id] ?? ""
                     let formState = FormFeature.State(
                         type: .post(
                             type: .new,
                             topicId: topic.id,
-                            content: .simple("", [])
+                            content: .simple(draft, [])
                         )
                     )
-                    state.destination = .form(formState)
+                    state.destination = .newPost(formState)
                     return .none
                     
                 case .writePostWithTemplate:
@@ -374,7 +423,7 @@ public struct TopicFeature: Reducer, Sendable {
                             content: .template([])
                         )
                     )
-                    state.destination = .form(formState)
+                    state.destination = .template(formState)
                     return .none
                     
                 case .edit:
@@ -462,14 +511,18 @@ public struct TopicFeature: Reducer, Sendable {
             case let .view(.contextPostMenu(action)):
                 switch action {
                 case let .reply(postId, authorName):
+                    let reply = "[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], "
+                    let draft = state.postDraftsCache.topics[state.topicId] ?? ""
+                    let text = draft.contains(reply) ? draft : draft + reply
+                    state.$postDraftsCache.withLock { $0.topics[state.topicId] = text }
                     let formState = FormFeature.State(
                         type: .post(
                             type: .new,
                             topicId: state.topicId,
-                            content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
+                            content: .simple(text, [])
                         )
                     )
-                    state.destination = .form(formState)
+                    state.destination = .newPost(formState)
                     return .none
                     
                 case let .edit(post):
@@ -482,12 +535,12 @@ public struct TopicFeature: Reducer, Sendable {
                             })
                         )
                     )
-                    state.destination = .form(formState)
+                    state.destination = .newPost(formState)
                     return .none
                     
                 case let .report(id):
                     let feature = FormFeature.State(type: .report(id: id, type: .post))
-                    state.destination = .form(feature)
+                    state.destination = .newPost(feature)
                     return .none
                     
                 case .karma(let id):
@@ -531,6 +584,13 @@ public struct TopicFeature: Reducer, Sendable {
                 switch action {
                 case .move(let postId):
                     state.destination = .move(ForumMoveFeature.State(type: .posts([postId])))
+                    return .none
+                    
+                case .punish(let postId, let authorId):
+                    state.destination = .punish(UserPunishmentFeature.State(
+                        userId: authorId,
+                        target: .post(id: postId)
+                    ))
                     return .none
                     
                 case .eventLog(let postId):
@@ -588,14 +648,36 @@ public struct TopicFeature: Reducer, Sendable {
                 formatter.dateFormat = "dd.MM.yy, HH:mm"
                 let currentDate = formatter.string(from: post.post.createdAt)
                 let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\(quotedText)[/quote]\n"
-                let feature = FormFeature.State(
-                    type: .post(
-                        type: .new,
-                        topicId: state.topicId,
-                        content: .simple(formattedQuote, [])
+
+                if state.destination == nil {
+                    let draft = state.postDraftsCache.topics[state.topicId] ?? ""
+                    let text = draft + formattedQuote
+                    state.$postDraftsCache.withLock { $0.topics[state.topicId] = text }
+                    let feature = FormFeature.State(
+                        type: .post(
+                            type: .new,
+                            topicId: state.topicId,
+                            content: .simple(text, [])
+                        )
                     )
-                )
-                state.destination = .form(feature)
+                    state.destination = .newPost(feature)
+                } else if case var .newPost(feature) = state.destination,
+                          case var .editor(editor) = feature.rows.first {
+                    if let textRange = editor.textRange,
+                       let insertionRange = Range(textRange, in: editor.text) {
+                        editor.text.insert(contentsOf: formattedQuote, at: insertionRange.lowerBound)
+                        editor.textRange = NSRange(
+                            location: textRange.location + formattedQuote.utf16.count,
+                            length: 0
+                        )
+                    } else {
+                        editor.text.append(formattedQuote)
+                        editor.textRange = NSRange(location: editor.text.utf16.count, length: 0)
+                    }
+                    feature.rows[id: editor.id] = .editor(editor)
+                    state.destination = .newPost(feature)
+                    state.$postDraftsCache.withLock { $0.topics[state.topicId] = editor.text }
+                }
                 return .none
                 
             case .view(.finishedPostAnimation):
@@ -664,14 +746,18 @@ public struct TopicFeature: Reducer, Sendable {
                 //customDump(topic)
                 state.topic = topic
 
+                return .run { send in
+                    await send(.pageNavigation(.update(count: topic.postsCount, offset: nil)))
+                    await send(.internal(.topicNavigationUpdated(topic)))
+                }
+
+            case let .internal(.topicNavigationUpdated(topic)):
                 return .run { [
                     isFirstPage = state.pageNavigation.isFirstPage,
                     topicPerPage = state.appSettings.topicPerPage,
                     shouldShowTopicHatButton = state.shouldShowTopicHatButton,
                     isLastPage = state.pageNavigation.isLastPage
                 ] send in
-                        await send(.pageNavigation(.update(count: topic.postsCount, offset: nil)))
-
                         var topicTypes: [[UITopicType]] = []
                         
                         topicTypes = await withTaskGroup(of: (Int, [UITopicType]).self, returning: [[UITopicType]].self) { taskGroup in
@@ -700,7 +786,7 @@ public struct TopicFeature: Reducer, Sendable {
                             
                             // Syncing notifications and badges when reading last page
                             let unread = try await apiClient.getUnread(type: .all)
-                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                            await notificationsClient.showUnreadNotifications(unread)
                         }
                         // Deleting notifications related to posts on the current page
                         // `forumMention` notifications encode topicId in the trailing identifier segment
@@ -722,7 +808,6 @@ public struct TopicFeature: Reducer, Sendable {
                 state.isLoadingTopic = false
                 state.isRefreshing = false
                 state.shouldShowTopicPollButton = true
-                state.shouldShowTopicHatButton = !state.pageNavigation.isFirstPage
                 
                 analyticsClient.reportFullyDisplayed()
                 return .none

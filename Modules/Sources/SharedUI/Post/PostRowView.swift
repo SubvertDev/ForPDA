@@ -112,10 +112,19 @@ public struct PostRowView: View {
                 }
                 
                 HStack(spacing: 8) {
-                    let text = User.Group(rawValue: state.post.post.author.groupId)?.title ?? ""
-                    Text(text)
+                    if let authorGroup = User.Group(rawValue: state.post.post.author.groupId) {
+                        HStack(spacing: 4) {
+                            if authorGroup != .curator, state.topicCuratorId == state.post.post.author.id {
+                                Text(verbatim: "[K]")
+                                    .foregroundStyle(Color(.tintColor))
+                            }
+                            
+                            let showTopicCuratorTitle = authorGroup == .curator && state.topicCuratorId == state.post.post.author.id
+                            Text(showTopicCuratorTitle ? String(localized: "Topic Curator", bundle: .module) : authorGroup.title)
+                                .foregroundStyle(Color(.Labels.teritary))
+                        }
                         .font(.caption)
-                        .foregroundStyle(Color(.Labels.teritary))
+                    }
                     
                     Spacer()
                     
@@ -260,6 +269,15 @@ public struct PostRowView: View {
             
             if state.post.post.canModerate {
                 ToolsContextMenu()
+            } else if state.isUserAuthorized, state.topicCuratorId == state.sessionUserId {
+                ContextButton(
+                    text: LocalizedStringResource("Move", bundle: .module),
+                    symbol: .arrowRight
+                ) {
+                    toolsMenuAction(.move(state.post.id))
+                }
+                
+                // TODO: merge posts
             }
             
             Section {
@@ -284,6 +302,20 @@ public struct PostRowView: View {
             Section {
                 ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
                     menuAction(.copyLink(state.post.id))
+                }
+            }
+            
+            if state.post.post.canModerate, state.post.post.author.id != state.sessionUserId {
+                Section {
+                    Button(role: .destructive) {
+                        toolsMenuAction(.punish(state.post.id, state.post.post.author.id))
+                    } label: {
+                        HStack {
+                            Text("Punish", bundle: .module)
+                            Image(systemSymbol: .personCropCircleBadgeXmark)
+                        }
+                    }
+                    .tint(.red)
                 }
             }
         } label: {
@@ -380,6 +412,7 @@ public extension PostRowView {
     struct State: Equatable {
         public let post: UIPost
         public let sessionUserId: Int
+        public let topicCuratorId: Int
         public let userSessionInfo: UserSessionInfo?
         public let canPostInTopic: Bool
         
@@ -389,6 +422,7 @@ public extension PostRowView {
         public init(
             post: UIPost,
             sessionUserId: Int = 0,
+            topicCuratorId: Int = 0,
             userSessionInfo: UserSessionInfo?,
             canPostInTopic: Bool = false,
             isUserAuthorized: Bool = false,
@@ -396,6 +430,7 @@ public extension PostRowView {
         ) {
             self.post = post
             self.sessionUserId = sessionUserId
+            self.topicCuratorId = topicCuratorId
             self.userSessionInfo = userSessionInfo
             self.canPostInTopic = canPostInTopic
             self.isUserAuthorized = isUserAuthorized

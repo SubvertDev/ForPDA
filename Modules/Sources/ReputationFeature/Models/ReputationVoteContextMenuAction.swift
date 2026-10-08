@@ -9,6 +9,7 @@ import Models
 
 public enum ReputationVoteContextMenuAction {
     case report(Int)
+    case punish(Int, Int)
     case modify(Int, ReputationModifyActionType)
     case goToAuthor(Int)
 }

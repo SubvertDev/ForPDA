@@ -84,6 +84,8 @@ public struct TicketsListFeature: Reducer, Sendable {
             case onFirstAppear
             case onNextAppear
             case onRefresh
+            case showOnlyMineChanged(Bool)
+            case sortByForumsChanged(Bool)
             
             case ticketButtonTapped(Int)
             
@@ -119,12 +121,6 @@ public struct TicketsListFeature: Reducer, Sendable {
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
-            .onChange(of: \.appSettings.tickets.isSortByForums) { _, _ in
-                return .send(.internal(.refresh))
-            }
-            .onChange(of: \.appSettings.tickets.isShowOnlyMine) { _, _ in
-                return .send(.internal(.refresh))
-            }
         
         Scope(\.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
@@ -159,6 +155,18 @@ public struct TicketsListFeature: Reducer, Sendable {
                 guard !state.isLoading else { return .none }
                 return .send(.internal(.refresh))
                 
+            case let .view(.showOnlyMineChanged(isShowOnlyMine)):
+                state.$appSettings.tickets.isShowOnlyMine.withLock {
+                    $0 = isShowOnlyMine
+                }
+                return .send(.internal(.refresh))
+
+            case let .view(.sortByForumsChanged(isSortByForums)):
+                state.$appSettings.tickets.isSortByForums.withLock {
+                    $0 = isSortByForums
+                }
+                return .send(.internal(.refresh))
+
             case let .view(.ticketButtonTapped(id)):
                 return .send(.delegate(.openTicket(id)))
                 
@@ -179,8 +187,8 @@ public struct TicketsListFeature: Reducer, Sendable {
                 
             case let .view(.contextTicketMenu(action, ticketId)):
                 switch action {
-                case .changeStatus(let status):
-                    return .run { [handlerId = state.tickets[ticketId].info.handlerId] send in
+                case .changeStatus(let status, let handlerId):
+                    return .run { send in
                         let response = try await ticketClient.changeTicketStatus(ticketId, handlerId, status)
                         await send(.internal(.changeTicketStatusResponse(.success((ticketId, status, response)))))
                     } catch: { error, send in
@@ -264,10 +272,10 @@ public struct TicketsListFeature: Reducer, Sendable {
                     case .processing:   (session.userId, handlerName, nil)
                     case .notProcessed: (0, "", nil)
                     }
-                    state.tickets[ticketId].info.status = status
-                    state.tickets[ticketId].info.handlerId = info.0
-                    state.tickets[ticketId].info.handlerName = info.1
-                    state.tickets[ticketId].info.processedAt = info.2
+                    state.tickets[id: ticketId]?.info.status = status
+                    state.tickets[id: ticketId]?.info.handlerId = info.0
+                    state.tickets[id: ticketId]?.info.handlerName = info.1
+                    state.tickets[id: ticketId]?.info.processedAt = info.2
                 }
                 return .run { _ in
                     await toastClient.showToast(ToastMessage(text: Localization.statusChanged, haptic: .success))
@@ -276,10 +284,10 @@ public struct TicketsListFeature: Reducer, Sendable {
             case let .internal(.changeTicketStatusResponse(.success((ticketId, _, .failure(reason))))):
                 switch reason {
                 case .handlerChanged(let id, let name):
-                    state.tickets[ticketId].info.handlerId = id
-                    state.tickets[ticketId].info.handlerName = name
+                    state.tickets[id: ticketId]?.info.handlerId = id
+                    state.tickets[id: ticketId]?.info.handlerName = name
                     return .run { _ in
-                        await toastClient.showToast(ToastMessage(text: Localization.handlerChanged, haptic: .success))
+                        await toastClient.showToast(ToastMessage(text: Localization.handlerChanged, isError: true, haptic: .error))
                     }
                     
                 case .other:

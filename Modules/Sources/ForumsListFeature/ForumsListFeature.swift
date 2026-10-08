@@ -68,7 +68,7 @@ public struct ForumsListFeature: Reducer, Sendable {
             case .view(.onAppear):
                 guard state.forums == nil else { return .none }
                 return .run { send in
-                    for try await forumList in try await apiClient.getForumsList(policy: .cacheOrLoad) {
+                    for try await forumList in try await apiClient.getForumsList(policy: .cacheAndLoad) {
                         await send(.internal(.forumsListResponse(.success(forumList))))
                     }
                 } catch: { error, send in

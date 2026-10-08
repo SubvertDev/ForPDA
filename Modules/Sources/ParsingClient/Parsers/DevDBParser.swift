@@ -137,7 +137,7 @@ public struct DevDBParser {
             
             devices.append(.init(
                 tag: tag,
-                name: name,
+                name: name.convertCodes(),
                 imageUrl: URL(string: url)!,
                 entries: try parseVendorDeviceEntry(entriesRaw),
                 isActual: isActual != 0
@@ -156,7 +156,7 @@ public struct DevDBParser {
                 throw ParsingError.failedToCastFields
             }
             
-            entries.append(.init(name: name, value: value))
+            entries.append(.init(name: name.convertCodes(), value: value.convertCodes()))
         }
         return entries
     }
@@ -191,7 +191,7 @@ public struct DevDBParser {
                 throw ParsingError.failedToCastFields
             }
             
-            editions.append(.init(name: name, subTag: subTag))
+            editions.append(.init(name: name.convertCodes(), subTag: subTag.convertCodes()))
         }
         return editions
     }
@@ -207,12 +207,12 @@ public struct DevDBParser {
             }
             
             if specType == 0 { // category
-                specs.append(.init(id: index, title: title, entries: []))
+                specs.append(.init(id: index, title: title.convertCodes(), entries: []))
             } else {
                 guard let value = spec[safe: 4] as? String else {
                     throw ParsingError.failedToCastFields
                 }
-                specs[specs.count - 1].entries.append(.init(name: title, value: value))
+                specs[specs.count - 1].entries.append(.init(name: title.convertCodes(), value: value.convertCodes()))
             }
         }
         return specs

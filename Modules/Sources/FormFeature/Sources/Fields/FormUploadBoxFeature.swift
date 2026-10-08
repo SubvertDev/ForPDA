@@ -55,6 +55,7 @@ public struct FormUploadBoxFeature: Reducer {
         
         func isValid() -> Bool {
             if isLocked { return false }
+            if isHidden { return true }
             return isRequired ? !uploadedFilesIds.isEmpty : true
         }
     }

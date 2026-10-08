@@ -6,7 +6,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Подключаемся"
+            "value" : "Подключение..."
           }
         }
       }
@@ -16,7 +16,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Нет интернет соединения"
+            "value" : "Нет подключения к интернету"
           }
         }
       }
@@ -26,7 +26,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не получилось открыть ссылку"
+            "value" : "Не удалось открыть ссылку"
           }
         }
       }

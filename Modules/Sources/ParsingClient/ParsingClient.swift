@@ -27,6 +27,9 @@ public struct ParsingClient: Sendable {
     public var parseReputationVotes: @Sendable ( _ response: String) async throws -> ReputationVotes
     public var parseAvatarUrl: @Sendable (_ response: String) async throws -> UserAvatarResponseType
     
+    // User Punishment
+    public var parseUserPunishmentTemplates: @Sendable (_ response: String) async throws -> [UserPunishmentCategory]
+    
     // Bookmarks
     public var parseBookmarksList: @Sendable (_ response: String) async throws -> [Bookmark]
     
@@ -105,6 +108,9 @@ extension ParsingClient: DependencyKey {
         },
         parseAvatarUrl: { response in
             return try ProfileParser.parseAvatarUrl(from: response)
+        },
+        parseUserPunishmentTemplates: { response in
+            return try UserPunishmentParser.parseTemplateCategories(from: response)
         },
         parseBookmarksList: { response in
             return try BookmarksParser.parse(from: response)

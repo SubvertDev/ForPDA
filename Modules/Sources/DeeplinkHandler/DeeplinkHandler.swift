@@ -10,6 +10,7 @@ import ComposableArchitecture
 import AnalyticsClient
 import APIClient
 import Models
+import OSLog
 
 public enum Deeplink {
     case article(id: Int, title: String, imageUrl: URL, scrollToId: Int?)
@@ -23,6 +24,7 @@ public enum Deeplink {
     case ticketsList(offset: Int)
     case ticket(Int)
     case eventLog(Int, ForumEventLogType)
+    case changeReputation(userId: Int, action: ReputationChangeActionType, content: ReputationChangeContentType, message: String)
 }
 
 public struct DeeplinkHandler {
@@ -185,10 +187,7 @@ public struct DeeplinkHandler {
         // showtopic
         
         if let topicItem = queryItems.first(where: { $0.name == "showtopic" }), let value = topicItem.value, let topicId = Int(value) {
-            let postsFilter: TopicPostsFilter? = if let modfilterItem = queryItems.first(where: { $0.name == "modfilter" }),
-                                                      let postsFilter = TopicPostsFilter(rawValue: modfilterItem.value) {
-                postsFilter
-            } else { nil }
+            let postsFilter = TopicPostsFilter(rawValue: queryItems.first(where: { $0.name == "modfilter" })?.value)
             if let viewType = queryItems.first(where: { $0.name == "view" })?.value {
                 switch viewType {
                 case "findpost":
@@ -274,6 +273,38 @@ public struct DeeplinkHandler {
                     }
                 } else {
                     analytics.capture(DeeplinkError.noType(of: "code", for: url.absoluteString))
+                }
+                
+            case "rep":
+                // https://4pda.to/forum/index.php?act=rep&type=win_add&mid=6176341&p=142534362&message=BeautifullEyes
+                // https://4pda.to/forum/index.php?act=rep&type=win_minus&mid=6176341&p=142534362
+                guard let userIdRaw = queryItems.first(where: { $0.name == "mid" })?.value, let userId = Int(userIdRaw) else {
+                    throw .noType(of: "mid", for: url.absoluteString)
+                }
+                
+                if let type = queryItems.first(where: { $0.name == "type" })?.value ?? queryItems.first(where: { $0.name == "view" })?.value {
+                    let contentType = if let postIdRaw = queryItems.first(where: { $0.name == "p" })?.value, let postId = Int(postIdRaw) {
+                        ReputationChangeContentType.post(id: postId)
+                    } else if let commentIdRaw = queryItems.first(where: { $0.name == "c" })?.value, let commentId = Int(commentIdRaw) {
+                        ReputationChangeContentType.comment(id: commentId)
+                    } else {
+                        ReputationChangeContentType.profile
+                    }
+                    
+                    let message = queryItems.first(where: { $0.name == "message" })?.value?.unEscape() ?? ""
+                    
+                    switch type {
+                    case "win_add": // up reputation
+                        return .changeReputation(userId: userId, action: .up, content: contentType, message: message)
+                        
+                    case "win_minus":
+                        return .changeReputation(userId: userId, action: .down, content: contentType, message: message)
+                        
+                    default:
+                        analytics.capture(DeeplinkError.unknownType(type: type, for: url.absoluteString))
+                    }
+                } else {
+                    analytics.capture(DeeplinkError.noType(of: "type", for: url.absoluteString))
                 }
                 
             case "search":
@@ -374,14 +405,14 @@ public struct DeeplinkHandler {
         guard let idString = split[safe: 1],    let id = Int(idString)               else { throw .noDeeplinkAvailable(for: url) }
         guard let timestampString = split.last, let timestamp = Int(timestampString) else { throw .noDeeplinkAvailable(for: url) }
         
-        guard let type = Unread.Item.Category(rawValue: typeInt) else { throw .noDeeplinkAvailable(for: url) }
+        guard let type = PDANotification.Kind(rawValue: typeInt) else { throw .noDeeplinkAvailable(for: url) }
         
         switch type {
-        case .qms:
+        case .qmsMessage:
             return Deeplink.qms(id: id)
-        case .forum:
+        case .newTopic:
             return Deeplink.forum(id: id, page: 1)
-        case .topic:
+        case .newPost:
             // Currently we don't have id of a post to jump due to limited api
             return Deeplink.topic(id: id, goTo: .unread, filter: nil)
         case .forumMention:

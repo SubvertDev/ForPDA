@@ -9,15 +9,20 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: App.bundleId,
-            deploymentTargets: .iOS("16.0"),
+            deploymentTargets: App.deploymentTargets,
             infoPlist: .main,
             sources: ["Modules/App/**"],
             resources: ["Modules/Resources/**"],
+            entitlements: .dictionary([
+                "aps-environment": "development",
+                "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
+            ]),
             dependencies: [
                 .Internal.AppFeature,
                 .Internal.CacheClient,
                 .Internal.Models,
                 .target(name: "SafariExtension"),
+                .target(name: "NotificationServiceExtension"),
                 .SPM.TCA,
             ],
             settings: .settings(
@@ -48,6 +53,7 @@ let project = Project(
                     .Internal.ForumEventLogFeature,
                     .Internal.ForumFeature,
                     .Internal.ForumsListFeature,
+                    .Internal.HapticClient,
                     .Internal.HistoryFeature,
                     .Internal.LoggerClient,
                     .Internal.LogStoreFeature,
@@ -61,6 +67,7 @@ let project = Project(
                     .Internal.ProfileFeature,
                     .Internal.QMSFeature,
                     .Internal.QMSListFeature,
+                    .Internal.ReputationChangeFeature,
                     .Internal.ReputationFeature,
                     .Internal.SearchFeature,
                     .Internal.SearchResultFeature,
@@ -107,6 +114,7 @@ let project = Project(
                     .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
+                    .Internal.ParsingClient,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
                     .Internal.ReputationChangeFeature,
@@ -128,6 +136,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.PasteboardClient,
@@ -303,6 +312,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
@@ -429,6 +439,7 @@ let project = Project(
                 name: "NotificationsFeature",
                 dependencies: [
                     .Internal.AnalyticsClient,
+                    .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
@@ -446,6 +457,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.BBPanelFeature,
+                    .Internal.CacheClient,
                     .Internal.CreateChatFeature,
                     .Internal.Models,
                     .Internal.NotificationsClient,
@@ -454,7 +466,9 @@ let project = Project(
                     .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
+                    .Internal.TopicBuilder,
                     .Internal.FormFeature,
+                    .Internal.UserPunishmentFeature,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
@@ -481,6 +495,7 @@ let project = Project(
                     .Internal.CacheClient,
                     .Internal.CreateChatFeature,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.QMSClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
@@ -532,6 +547,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.FormFeature,
                     .Internal.ToastClient,
+                    .Internal.UserPunishmentFeature,
                     .SPM.TCA,
                 ]
              ),
@@ -556,6 +572,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.PersistenceKeys,
+                    .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,
@@ -652,6 +669,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.DeeplinkHandler,
                     .Internal.GalleryFeature,
                     .Internal.Models,
@@ -669,6 +687,7 @@ let project = Project(
                     .Internal.FormFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
+                    .Internal.UserPunishmentFeature,
                     .SPM.MemberwiseInit,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
@@ -681,6 +700,18 @@ let project = Project(
                 name: "UploadBoxFeature",
                 dependencies: [
                     .Internal.APIClient,
+                    .Internal.SharedUI,
+                    .SPM.TCA,
+                ]
+            ),
+
+            .feature(
+                name: "UserPunishmentFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
                     .SPM.TCA,
                 ]
             ),
@@ -692,6 +723,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBPanelFeature,
+                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.TopicBuilder,
@@ -735,7 +767,6 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.Models,
-                    .Internal.SharedUI,
                     .SPM.TCA,
                     .SPM.ZMarkupParser,
                 ]
@@ -878,7 +909,7 @@ let project = Project(
 //                destinations: .iOS,
 //                product: .unitTests,
 //                bundleId: "com.subvert.forpda.tests",
-//                deploymentTargets: .iOS("16.0"),
+//                deploymentTargets: App.deploymentTargets,
 //                infoPlist: .default,
 //                sources: ["Modules/Tests/ForPDATests/**"],
 //                resources: [],
@@ -918,7 +949,7 @@ let project = Project(
                 destinations: .iOS,
                 product: .appExtension,
                 bundleId: App.bundleId + "." + "safariextension",
-                deploymentTargets: .iOS("16.0"),
+                deploymentTargets: App.deploymentTargets,
                 infoPlist: .safariExtension,
                 sources: ["Extensions/Safari/**"],
                 resources: [
@@ -944,6 +975,36 @@ let project = Project(
                             "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
                         ])
                 )
+            ),
+
+            .target(
+                name: "NotificationServiceExtension",
+                destinations: .iOS,
+                product: .appExtension,
+                bundleId: App.bundleId + "." + "nse",
+                deploymentTargets: App.deploymentTargets,
+                infoPlist: .notificationServiceExtension,
+                sources: ["Extensions/NotificationService/**"],
+                resources: ["Extensions/NotificationService/Resources/**"],
+                entitlements: .dictionary([
+                    "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
+                ]),
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.NotificationsClient,
+                ],
+                settings: .settings(
+                    base: SettingsDictionary()
+                        .manualCodeSigning(
+                            identity: "iPhone Developer",
+                            provisioningProfileSpecifier: "match Development com.subvert.forpda.nse"
+                        )
+                        .setDevelopmentTeam("7353CQCGQC")
+                        .merging([
+                            "TARGETED_DEVICE_FAMILY": "1",
+                            "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
+                        ])
+                )
             )
     ],
     resourceSynthesizers: [
@@ -957,8 +1018,9 @@ let project = Project(
 
 struct App {
     static let name = "ForPDA"
-    static let destinations: ProjectDescription.Destinations = .iOS
+    static let destinations: Destinations = .iOS
     static let bundleId = "com.subvert.forpda"
+    static let deploymentTargets: DeploymentTargets = .iOS("16.0")
 }
 
 extension ProjectDescription.Target {
@@ -996,7 +1058,7 @@ extension ProjectDescription.Target {
             destinations: App.destinations,
             product: productType,
             bundleId: App.bundleId + "." + name,
-            deploymentTargets: .iOS("16.0"),
+            deploymentTargets: App.deploymentTargets,
             infoPlist: infoPlist,
             sources: sources,
             resources: .resources(resources),
@@ -1020,7 +1082,7 @@ extension ProjectDescription.Target {
             destinations: App.destinations,
             product: .unitTests,
             bundleId: App.bundleId + "." + name + ".Tests",
-            deploymentTargets: .iOS("16.0"),
+            deploymentTargets: App.deploymentTargets,
             infoPlist: .default,
             sources: ["Modules/Sources/\(name)/Tests/**"],
             // resources: ["Modules/Resources/**"],
@@ -1186,6 +1248,18 @@ extension InfoPlist {
             ]
         ]
     )
+
+    static let notificationServiceExtension = InfoPlist.extendingDefault(
+        with: [
+            "CFBundleDisplayName": "$(PRODUCT_NAME)",
+            "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+            "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+            "NSExtension": [
+                "NSExtensionPointIdentifier": "com.apple.usernotifications.service",
+                "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).NotificationService"
+            ]
+        ]
+    )
 }
 
 // MARK: - Dependencies
@@ -1238,6 +1312,7 @@ extension TargetDependency.Internal {
     static let TopicEditFeature =       TargetDependency.target(name: "TopicEditFeature")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
+    static let UserPunishmentFeature =  TargetDependency.target(name: "UserPunishmentFeature")
     
     // Clients
     static let AnalyticsClient =     TargetDependency.target(name: "AnalyticsClient")

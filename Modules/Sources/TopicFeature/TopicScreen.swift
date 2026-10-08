@@ -20,6 +20,7 @@ import GalleryFeature
 import ForumStatFeature
 import ForumMoveFeature
 import TopicEditFeature
+import UserPunishmentFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -57,6 +58,15 @@ public struct TopicScreen: View {
         return topicLoaded && store.topic!.poll != nil
     }
     
+    private var isNewPostPresented: Bool {
+        switch store.destination {
+        case .newPost:
+            return true
+        default:
+            return false
+        }
+    }
+    
     // MARK: - Init
     
     public init(store: StoreOf<TopicFeature>) {
@@ -92,6 +102,13 @@ public struct TopicScreen: View {
                                 if shouldShowBottomNavigation {
                                     Navigation()
                                 }
+                                
+                                if #available(iOS 17, *) {
+                                    if isNewPostPresented {
+                                        Color.clear
+                                            .containerRelativeFrame(.vertical, count: 2, span: 1, spacing: 0)
+                                    }
+                                }
                             }
                             .padding(.bottom, 16)
                         }
@@ -115,20 +132,23 @@ public struct TopicScreen: View {
             }
             .navigations(store: store)
             .toolbar {
-                ToolbarItem {
-                    Button {
-                        send(.searchButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .magnifyingglass)
-                            .foregroundStyle(foregroundStyle())
+                if !isNewPostPresented {
+                    ToolbarItem {
+                        Button {
+                            send(.searchButtonTapped)
+                        } label: {
+                            Image(systemSymbol: .magnifyingglass)
+                                .foregroundStyle(foregroundStyle())
+                        }
                     }
-                }
-                
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer()
-                }
-                ToolbarItem {
-                    OptionsMenu()
+                    
+                    if #available(iOS 26.0, *) {
+                        ToolbarSpacer()
+                    }
+                    
+                    ToolbarItem {
+                        OptionsMenu()
+                    }
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -406,6 +426,7 @@ public struct TopicScreen: View {
             state: PostRowView.State(
                 post: post,
                 sessionUserId: store.isUserAuthorized ? store.userSession!.userId : 0,
+                topicCuratorId: store.topic?.curatorId ?? 0,
                 userSessionInfo: userSessionInfo,
                 canPostInTopic: store.topic?.canPost ?? false,
                 isUserAuthorized: store.isUserAuthorized,
@@ -426,34 +447,10 @@ public struct TopicScreen: View {
                 }
             },
             menuAction: { action in
-                switch action {
-                case .reply(let id, let authorName):
-                    send(.contextPostMenu(.reply(id, authorName)))
-                case .edit(let post):
-                    send(.contextPostMenu(.edit(post)))
-                case .karma(let postId):
-                    send(.contextPostMenu(.karma(postId)))
-                case .report(let postId):
-                    send(.contextPostMenu(.report(postId)))
-                case .changeReputation(let postId, let userId, let username):
-                    send(.contextPostMenu(.changeReputation(postId, userId, username)))
-                case .userPostsInTopic(let authorId):
-                    send(.contextPostMenu(.userPostsInTopic(authorId)))
-                case .mentions(let postId):
-                    send(.contextPostMenu(.mentions(postId)))
-                case .copyLink(let postId):
-                    send(.contextPostMenu(.copyLink(postId)))
-                }
+                send(.contextPostMenu(action))
             },
             toolsMenuAction: { action in
-                switch action {
-                case .move(let postId):
-                    send(.contextPostToolsMenu(.move(postId)))
-                case .eventLog(let postId):
-                    send(.contextPostToolsMenu(.eventLog(postId)))
-                case .modify(let action, let postId, let isUndo):
-                    send(.contextPostToolsMenu(.modify(action, postId, isUndo)))
-                }
+                send(.contextPostToolsMenu(action))
             }
         )
         .listRowBackground(Color.clear)
@@ -507,6 +504,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(title))
                 ._toolbarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden(store.destination != nil)
                 .alert($store.scope(\.$destination, action: \.destination).alert)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
@@ -537,7 +535,7 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).form) { store in
+                    .fullScreenCover(item: $store.scope(\.destination?.template, action: \.destination.template)) { store in
                         NavigationStack {
                             FormScreen(store: store)
                         }
@@ -545,6 +543,11 @@ struct NavigationModifier: ViewModifier {
                     .fullScreenCover(item: $store.scope(\.destination?.edit, action: \.destination.edit)) { store in
                         NavigationStack {
                             TopicEditView(store: store)
+                        }
+                    }
+                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).punish) { store in
+                        NavigationStack {
+                            UserPunishmentScreen(store: store)
                         }
                     }
                     .fullScreenCover(item: $store.scope(\.destination, action: \.destination).gallery) { model in
@@ -592,6 +595,14 @@ struct NavigationModifier: ViewModifier {
                     NavigationStack {
                         ForumStatView(store: store)
                     }
+                }
+                .sheet(item: $store.scope(\.$destination, action: \.destination).newPost) { store in
+                    NavigationStack {
+                        FormScreen(store: store)
+                            .backport.scrollBounceBehavior(.basedOnSize)
+                    }
+                    .presentationDetents([.medium, .large])
+                    .backport.presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
         }
     }
@@ -672,7 +683,7 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .form(
+                destination: .newPost(
                     FormFeature.State(
                         type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
@@ -707,7 +718,7 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .form(
+                destination: .newPost(
                     FormFeature.State(
                         type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
@@ -738,7 +749,7 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .form(
+                destination: .newPost(
                     FormFeature.State(
                         type: .post(
                             type: .new, topicId: 0, content: .template([])
@@ -769,7 +780,7 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .form(
+                destination: .newPost(
                     FormFeature.State(
                         type: .post(type: .new, topicId: 0, content: .template([]))
                     )

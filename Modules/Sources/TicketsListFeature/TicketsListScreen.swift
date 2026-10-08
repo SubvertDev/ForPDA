@@ -116,13 +116,19 @@ public struct TicketsListScreen: View {
                 Section {
                     Toggle(
                         LocalizedStringResource("Only My", bundle: .module),
-                        isOn: Binding(projectedValue: $store.appSettings.tickets.isShowOnlyMine)
+                        isOn: Binding(
+                            get: { store.appSettings.tickets.isShowOnlyMine },
+                            set: { send(.showOnlyMineChanged($0)) }
+                        )
                     )
                     
                     if case .list = store.type {
                         Toggle(
                             LocalizedStringResource("Sort by Forums", bundle: .module),
-                            isOn: Binding(projectedValue: $store.appSettings.tickets.isSortByForums)
+                            isOn: Binding(
+                                get: { store.appSettings.tickets.isSortByForums },
+                                set: { send(.sortByForumsChanged($0)) }
+                            )
                         )
                     }
                 } header: {
@@ -145,7 +151,7 @@ public struct TicketsListScreen: View {
         Menu {
             Section {
                 Menu {
-                    TicketStatusPicker(id: id)
+                    TicketStatusPicker(id: id, handlerId: ticket.handlerId)
                 } label: {
                     HStack {
                         Text("Change Status", bundle: .module)
@@ -203,7 +209,7 @@ public struct TicketsListScreen: View {
     private func TicketRow(_ ticket: TicketsList.TicketSimplified) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Menu {
-                TicketStatusPicker(id: ticket.id)
+                TicketStatusPicker(id: ticket.id, handlerId: ticket.info.handlerId)
             } label: {
                 TicketStatusBadge(info: ticket.info)
             }
@@ -266,6 +272,7 @@ public struct TicketsListScreen: View {
             }
         }
         .font(.caption)
+        .fontWeight(.medium)
         .foregroundStyle(info.status.textColor)
         .padding(.vertical, 2)
         .padding(.horizontal, 6)
@@ -277,13 +284,13 @@ public struct TicketsListScreen: View {
     
     // MARK: - Ticket Status Picker
     
-    private func TicketStatusPicker(id: Int) -> some View {
+    private func TicketStatusPicker(id: Int, handlerId: Int) -> some View {
         WithPerceptionTracking {
-            let status = store.tickets.first(where: { $0.id == id })!.info.status
+            let status = store.tickets[id: id]!.info.status
             Picker(String(), selection: Binding(
                 get: { status },
                 set: { newValue in
-                    send(.contextTicketMenu(.changeStatus(newValue), id))
+                    send(.contextTicketMenu(.changeStatus(newValue, handlerId), id))
                 }
             )) {
                 ForEach(TicketStatus.allCases) { status in

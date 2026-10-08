@@ -15,6 +15,7 @@ import PasteboardClient
 import HapticClient
 import PersistenceKeys
 import ToastClient
+import CacheClient
 
 @Reducer
 public struct ArticlesListFeature: Reducer, Sendable {

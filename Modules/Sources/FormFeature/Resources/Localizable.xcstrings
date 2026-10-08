@@ -47,6 +47,16 @@
         }
       }
     },
+    "Hide and Publish" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Опубликовать и скрыть"
+          }
+        }
+      }
+    },
     "Input reason" : {
       "localizations" : {
         "ru" : {
@@ -237,6 +247,16 @@
         }
       }
     },
+    "Select method of publishing" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите как опубликовать"
+          }
+        }
+      }
+    },
     "Send report" : {
       "localizations" : {
         "en" : {
@@ -293,12 +313,12 @@
         }
       }
     },
-    "Unknown error" : {
+    "Unknown form error" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Неизвестная ошибка"
+            "value" : "Неизвестная ошибка формы"
           }
         }
       }

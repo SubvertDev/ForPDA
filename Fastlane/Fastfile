@@ -42,6 +42,8 @@ platform :ios do
             release: { desctiption: "Release channel: beta or stable", default: "beta" }   
         })
         
+        sh("tuist auth whoami")
+        
         setup_ci if ENV['CI']
         
         release_channel = (options[:release] || "beta").capitalize
@@ -74,6 +76,8 @@ platform :ios do
             build_number: { description: "Sets specific build number" },
             release: { desctiption: "Release channel: beta or stable", default: "beta" }   
         })
+        
+        sh("tuist auth whoami")
         
         setup_ci if ENV['CI']
         
@@ -265,7 +269,7 @@ platform :ios do
     
     desc "Uploads app to TestFlight"
     lane :upload_app_to_testflight do
-        key_id = "X36R58TMRJ"
+        key_id = "BGM8DBS29N"
         issuer_id = "814e488e-06ba-40ba-a16c-a63e7164023f"
         
         if ENV['CI']
@@ -276,7 +280,7 @@ platform :ios do
                 key_content: key_content
             )
         else
-            key_filepath = "Fastlane/AuthKey_X36R58TMRJ.p8"
+            key_filepath = "Fastlane/AuthKey_BGM8DBS29N.p8"
             app_store_connect_api_key(
                 key_id: key_id,
                 issuer_id: issuer_id,

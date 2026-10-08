@@ -194,7 +194,7 @@ public struct TabViewGallery: View {
     private func loadFullImages() {
         guard let ids else { return }
         let mainId = ids[selectedImageID]
-        Task {
+        _ = Task {
             @Dependency(\.apiClient) var api
             let url = try await api.getAttachment(id: mainId)
             gallery[selectedImageID] = url

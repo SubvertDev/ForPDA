@@ -11,6 +11,14 @@ public enum SearchSort: Sendable, Equatable, Codable {
     case dateAscSort
     case relevance
     
+    public var rawValue: String {
+        switch self {
+        case .dateDescSort: "dd"
+        case .dateAscSort:  "da"
+        case .relevance:    ""
+        }
+    }
+    
     var _rawValue: String {
         switch self {
         case .dateDescSort: "dateDescSort"

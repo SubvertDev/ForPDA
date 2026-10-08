@@ -29,6 +29,7 @@ public struct APIClient: Sendable {
     public var connect: @Sendable (_ inBackground: Bool) async throws -> Void
     public var disconnect: @Sendable () async -> Void
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
+    public var notify: @Sendable (_ token: String, _ settings: NotificationsSettings2, _ isDebug: Bool) async throws -> Bool
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
@@ -52,6 +53,10 @@ public struct APIClient: Sendable {
     public var changeReputation: @Sendable (_ data: ReputationChangeRequest) async throws -> ReputationChangeResponseType
     public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
     public var updateUserDevice: @Sendable (_ userId: Int, _ action: UserDeviceAction, _ fullTag: String, _ isPrimary: Bool) async throws -> Bool
+    
+    public var getUserPunishmentTemplates: @Sendable (_ forId: Int, _ userId: Int) async throws -> [UserPunishmentCategory]
+    public var applyUserPunishment: @Sendable (_ data: UserPunishmentApplyRequest) async throws -> UserPunishmentApplyResponse
+    public var cancelUserPunishment: @Sendable (_ userId: Int, _ reason: String) async throws -> Bool
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
@@ -146,6 +151,16 @@ extension APIClient: DependencyKey {
             
             setLogResponses: { type in
                 await api.setLogResponses(to: type)
+            },
+            
+            notify: { token, settings, isDebug in
+                let response = try await api.send(CommonCommand.notify(
+                    token: token,
+                    a: settings.rawValue,
+                    b: isDebug ? 0x0103 : 3
+                ))
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             // MARK: - Articles
@@ -300,6 +315,34 @@ extension APIClient: DependencyKey {
                     fullTag: fullTag,
                     primary: isPrimary
                 ))
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            
+            getUserPunishmentTemplates: { forId, userId in
+                let command = MemberCommand.Punishment.templates(forId: forId, memberId: userId)
+                let response = try await api.send(command)
+                return try await parser.parseUserPunishmentTemplates(response)
+            },
+            applyUserPunishment: { data in
+                let command = MemberCommand.Punishment.apply(data: MemberPunishmentApplyRequest(
+                    memberId: data.userId,
+                    subjectId: data.subjectId,
+                    reason: data.template.reason,
+                    message: data.template.message,
+                    flag: data.template.flag.rawValue,
+                    premod: data.template.premoderationHours,
+                    readOnly: data.template.readOnlyHours,
+                    violationCategory: data.categoryId,
+                    violationType: data.template.id
+                ))
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return UserPunishmentApplyResponse(rawValue: status) ?? .noAccess
+            },
+            cancelUserPunishment: { userId, reason in
+                let command = MemberCommand.Punishment.cancel(memberId: userId, reason: reason)
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
@@ -692,6 +735,9 @@ extension APIClient: DependencyKey {
             connect: { _ in },
             disconnect: { },
             setLogResponses: { _ in },
+            notify: { _, _, _ in
+                return true
+            },
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },
@@ -723,7 +769,7 @@ extension APIClient: DependencyKey {
             },
             getUser: { _, _ in
                 AsyncThrowingStream { cont in
-                    Task {
+                    _ = Task {
                         try await Task.sleep(for: .seconds(2))
                         cont.yield(.mock)
                         cont.finish()
@@ -749,6 +795,15 @@ extension APIClient: DependencyKey {
                 return .success(URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!)
             },
             updateUserDevice: { _, _, _, _ in
+                return true
+            },
+            getUserPunishmentTemplates: { _, _ in
+                return [.mockLight, .mockHigh]
+            },
+            applyUserPunishment: { _ in
+                return .success
+            },
+            cancelUserPunishment: { _, _ in
                 return true
             },
             getBookmarksList: {

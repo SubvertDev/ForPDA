@@ -9,5 +9,5 @@ import Models
 
 public enum UnreadType: Sendable {
     case all
-    case category(Unread.Item.Category, timestamp: Int)
+    case category(PDANotification.Kind, timestamp: Int)
 }

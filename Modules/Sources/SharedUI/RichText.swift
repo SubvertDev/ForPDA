@@ -168,7 +168,7 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
         if let url = (textAttachment as? AsyncTextAttachment)?.link {
             onUrlTap?(url)
         } else {
-            print("[ERROR] Couldn't extract postId from SnapbackImage")
+            print("[ERROR] Couldn't extract postId from AsyncTextAttachment")
         }
         return false
     }

@@ -1,12 +1,104 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%@: %lld новое сообщение" : {
+    "notifications.forumMention.title:%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@: %2$lld новое сообщение"
+            "state" : "translated",
+            "value" : "Mention in topic: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упоминание в теме %@"
+          }
+        }
+      }
+    },
+    "notifications.mention.memberName:%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ mentioned you"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ссылается на вас"
+          }
+        }
+      }
+    },
+    "notifications.newPost.hatUpdate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Topic header updated"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновилась шапка"
+          }
+        }
+      }
+    },
+    "notifications.newPost.title.memberName:%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ in the topic"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ в теме"
+          }
+        }
+      }
+    },
+    "notifications.newTopic.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New on the forum"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новое на форуме"
+          }
+        }
+      }
+    },
+    "notifications.qmsMessage.thread:%@.count:%lld" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%@: %lld new message"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%@: %lld new messages"
+                }
+              }
+            }
           }
         },
         "ru" : {
@@ -15,7 +107,7 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%1$@: %2$lld новых сообщений"
+                  "value" : "%1$@: %2$lld новых сообщения"
                 }
               },
               "many" : {
@@ -37,6 +129,22 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "notifications.siteMention.title:%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mention in news %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упоминание в новости %@"
           }
         }
       }

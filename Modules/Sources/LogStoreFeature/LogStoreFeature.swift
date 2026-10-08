@@ -92,18 +92,17 @@ public struct LogStoreFeature: Reducer, Sendable {
                         favoritesUnreadCount: 1,
                         mentionsUnreadCount: 0,
                         items: [
-                            Unread.Item(
-                                id: topicId,
-                                name: "Test topic \(topicId)",
-                                authorId: 0,
-                                authorName: "ForPDA",
-                                timestamp: timestamp,
-                                unreadCount: 0,
-                                category: .topic
-                            )
-                        ]
+                            PDANotificationDomain
+                                .newPost(
+                                    PDANotificationDomain.NewPost.make(
+                                        topicID: topicId,
+                                        topicTitle: "Test topic \(topicId)",
+                                        lastPostDate: timestamp.asDate()
+                                    )
+                                )
+                        ].map { $0.toRaw() }
                     )
-                    await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    await notificationsClient.showUnreadNotifications(unread)
                 }
                 
             case .view(.showConnectionStateButtonTapped):

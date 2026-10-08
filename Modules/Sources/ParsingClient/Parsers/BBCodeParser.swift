@@ -7,7 +7,6 @@
 
 import UIKit
 import SwiftUI
-import SharedUI
 import ZMarkupParser
 
 public final class BBCodeParser {

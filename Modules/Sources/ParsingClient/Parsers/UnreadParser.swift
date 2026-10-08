@@ -36,35 +36,34 @@ public struct UnreadParser {
         )
     }
     
-    private static func parseItems(_ itemsRaw: [[Any]]) throws(ParsingError) -> [Unread.Item] {
-        var items: [Unread.Item] = []
+    private static func parseItems(_ itemsRaw: [[Any]]) throws(ParsingError) -> [PDANotification] {
+        var items: [PDANotification] = []
         for item in itemsRaw {
             guard !item.isEmpty else {
                 continue
             }
             
-            guard let category = item[safe: 0] as? Int,
-                  let id = item[safe: 1] as? Int,
-                  let name = item[safe: 2] as? String,
-                  let authorId = item[safe: 3] as? Int,
-                  let authorName = item[safe: 4] as? String,
-                  let timestamp = item[safe: 5] as? Int,
-                  let unreadCount = item[safe: 7] as? Int else {
+            guard let kindRaw = item[safe: 0] as? Int,
+                  let kind = PDANotification.Kind(rawValue: kindRaw),
+                  let primaryID = item[safe: 1] as? Int,
+                  let primaryName = item[safe: 2] as? String,
+                  let memberID = item[safe: 3] as? Int,
+                  let memberName = item[safe: 4] as? String,
+                  let value = item[safe: 5] as? Int else {
                 throw ParsingError.failedToCastFields
             }
             
-            guard let category = Unread.Item.Category(rawValue: category) else {
-                throw ParsingError.failedToCastFields
-            }
-            
-            let item = Unread.Item(
-                id: id,
-                name: name,
-                authorId: authorId,
-                authorName: authorName,
-                timestamp: timestamp,
-                unreadCount: unreadCount, // unread for qms, notification type for others
-                category: category
+            let item = PDANotification(
+                kind: kind,
+                primaryID: primaryID,
+                primaryName: primaryName,
+                memberID: memberID,
+                memberName: memberName,
+                value: value,
+                dateValue: item[safe: 6] as? Int,
+                extra1: item[safe: 7] as? Int,
+                extra2: item[safe: 8] as? Int,
+                extra3: item[safe: 9] as? Int
             )
             items.append(item)
         }

@@ -8,10 +8,10 @@ on:
 jobs:
   cache_warmup_and_tests:
     name: Cache warmup & tests 
-    runs-on: macos-26
+    runs-on: xcode-27
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 

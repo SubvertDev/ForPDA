@@ -100,7 +100,13 @@ public struct ForumStatView: View {
             HStack(spacing: 12) {
                 InformationRow(LocalizedStringKey("Created At"), .text(topic.createdAt.formatted()))
                 
-                InformationRow(LocalizedStringKey("Author"), .text(topic.authorName))
+                Button {
+                    send(.userButtonTapped(topic.authorId))
+                } label: {
+                    InformationRow(LocalizedStringKey("Author"), .text(topic.authorName))
+                }
+                .buttonStyle(.plain)
+                .allowsHitTesting(topic.authorId != 0)
             }
             
             HStack(spacing: 12) {
@@ -109,7 +115,13 @@ public struct ForumStatView: View {
                 } else {
                     .text(topic.curatorName)
                 }
-                InformationRow(LocalizedStringKey("Curator"), curator)
+                Button {
+                    send(.userButtonTapped(topic.curatorId))
+                } label: {
+                    InformationRow(LocalizedStringKey("Curator"), curator)
+                }
+                .buttonStyle(.plain)
+                .allowsHitTesting(topic.curatorId != 0)
                 
                 InformationRow(
                     LocalizedStringKey("Status"),

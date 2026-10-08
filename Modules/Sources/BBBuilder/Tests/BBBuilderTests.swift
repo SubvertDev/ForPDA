@@ -127,6 +127,25 @@ struct BBBuilderTests {
     }
     
     // MARK: - Image Attachments
+
+    @Test func imageInsideUrlUsesUrlAsAttachmentLink() async throws {
+        let link = try #require(URL(string: "https://4pda.to/forum/index.php?showforum=281"))
+        let imageUrl = try #require(URL(string: "https://4pda.to/static/forum/style_images/f/281-i.png"))
+        let nodes = BBBuilder.build(
+            text: "[url=\"\(link.absoluteString)\"][img]\(imageUrl.absoluteString)[/img][/url]"
+        )
+
+        guard case let .text(text) = nodes.first,
+              nodes.count == 1,
+              let attachment = text.attribute(.attachment, at: 0, effectiveRange: nil) as? AsyncTextAttachment
+        else {
+            Issue.record("Expected a single text node containing an async image attachment")
+            return
+        }
+
+        #expect(attachment.attachmentUrl == imageUrl)
+        #expect(attachment.link == link)
+    }
     
     @Test func singleImageAttachment() async throws {
         let id = 0

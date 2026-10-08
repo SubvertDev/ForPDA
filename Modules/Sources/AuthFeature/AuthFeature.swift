@@ -12,6 +12,7 @@ import APIClient
 import HapticClient
 import PersistenceKeys
 import Models
+import AnalyticsClient
 
 public enum AuthOpenReason: String, Sendable {
     case commentAction

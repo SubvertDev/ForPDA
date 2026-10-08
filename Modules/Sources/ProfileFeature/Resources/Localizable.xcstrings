@@ -131,6 +131,16 @@
         }
       }
     },
+    "Cancel punishment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить наказание"
+          }
+        }
+      }
+    },
     "Change reputation" : {
       "localizations" : {
         "ru" : {
@@ -221,6 +231,16 @@
         }
       }
     },
+    "Enter the reason for cancellation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите причину отмены"
+          }
+        }
+      }
+    },
     "Female" : {
       "localizations" : {
         "ru" : {
@@ -277,6 +297,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Группа"
+          }
+        }
+      }
+    },
+    "Input reason..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите причину…"
           }
         }
       }
@@ -487,6 +517,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Профиль обновлен"
+          }
+        }
+      }
+    },
+    "Punish" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наказать"
+          }
+        }
+      }
+    },
+    "Punishment applied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наказание вынесено"
           }
         }
       }

@@ -8,10 +8,10 @@ on:
 jobs:
   pull_request_checks:
     name: Pull request checks
-    runs-on: macos-26
+    runs-on: xcode-27
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Common setup
         uses: ./.github/actions/setup

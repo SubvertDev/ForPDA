@@ -1,5 +1,5 @@
 {
-  "originHash" : "79a7e8b7cc4d29fdee54197860f04edc668ac08509b5da8f39ecc8b6e3befcf5",
+  "originHash" : "cc8eb172735038047e1d52c687d70af2c611289caca6485efec6c0bdf734415a",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -13,7 +13,7 @@
     {
       "identity" : "alerttoast",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/AlertToast.git",
+      "location" : "https://github.com/SubvertDev/AlertToast",
       "state" : {
         "branch" : "d0f7d6b",
         "revision" : "d0f7d6bafd3e8ffe99afba4995822d24aee044fb"
@@ -22,7 +22,7 @@
     {
       "identity" : "anchoredpopup",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/AnchoredPopup.git",
+      "location" : "https://github.com/SubvertDev/AnchoredPopup",
       "state" : {
         "branch" : "main",
         "revision" : "c409740455e14866a223715ed285da33cfd0f044"
@@ -31,7 +31,7 @@
     {
       "identity" : "cache",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/hyperoslo/Cache.git",
+      "location" : "https://github.com/hyperoslo/Cache",
       "state" : {
         "revision" : "24e47109e31b2031cb26e25cc1b81b607496066c",
         "version" : "7.4.0"
@@ -43,7 +43,7 @@
       "location" : "https://github.com/SubvertDev/Chat",
       "state" : {
         "branch" : "main",
-        "revision" : "44a08c5141ac32dde14e5707ad25d8bbed5be0e9"
+        "revision" : "63020101082251cbb6e2ed3248ed92611e2688ab"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/combine-schedulers",
       "state" : {
-        "revision" : "5928286acce13def418ec36d05a001a9641086f2",
-        "version" : "1.0.3"
+        "revision" : "114354e8c1667a2edc4993700fb9fa4f90157b56",
+        "version" : "1.2.2"
       }
     },
     {
@@ -85,7 +85,7 @@
     {
       "identity" : "mediapicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/MediaPicker.git",
+      "location" : "https://github.com/SubvertDev/MediaPicker",
       "state" : {
         "branch" : "main",
         "revision" : "199f445c1efa65291160d9589ad8509848130783"
@@ -94,19 +94,19 @@
     {
       "identity" : "nuke",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kean/Nuke.git",
+      "location" : "https://github.com/kean/Nuke",
       "state" : {
-        "revision" : "0ead44350d2737db384908569c012fe67c421e4d",
-        "version" : "12.8.0"
+        "revision" : "30f7a7e72e0607d304fbf69c799474bd5fb6d1ce",
+        "version" : "13.2.0"
       }
     },
     {
       "identity" : "pdapi_spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/PDAPI_SPM.git",
+      "location" : "https://github.com/SubvertDev/PDAPI_SPM",
       "state" : {
-        "revision" : "48377ee0d2984f8d53d8c92aec74dc8755245511",
-        "version" : "0.8.6"
+        "revision" : "86d8932bcf77aa7456d96fa0d1e5dff03a7f9b53",
+        "version" : "0.8.7"
       }
     },
     {
@@ -114,14 +114,14 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "ee5b5705b0038f0c44646cde5fe972bb65387596",
-        "version" : "3.61.0"
+        "revision" : "4642df21b8f4d16dbffcdfe92dbfe97f80b946fc",
+        "version" : "3.90.1"
       }
     },
     {
       "identity" : "richtextkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/RichTextKit.git",
+      "location" : "https://github.com/SubvertDev/RichTextKit",
       "state" : {
         "branch" : "main",
         "revision" : "be15182e607ae63a6e02cede1681ab824fd338fc"
@@ -130,16 +130,16 @@
     {
       "identity" : "sentry-cocoa",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/getsentry/sentry-cocoa.git",
+      "location" : "https://github.com/getsentry/sentry-cocoa",
       "state" : {
-        "revision" : "43abfbf9a26089ad34604c718ad0935440caf1d4",
-        "version" : "9.18.0"
+        "revision" : "b539e098293067be54fa5cf1f11d9e16cdbba94a",
+        "version" : "9.30.0"
       }
     },
     {
       "identity" : "sfsafesymbols",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SFSafeSymbols/SFSafeSymbols.git",
+      "location" : "https://github.com/SFSafeSymbols/SFSafeSymbols",
       "state" : {
         "revision" : "e01b3d4f861412f8dcee8d93c417d2c2b0cdfd77",
         "version" : "7.0.0"
@@ -148,7 +148,7 @@
     {
       "identity" : "skeletonui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/CSolanaM/SkeletonUI.git",
+      "location" : "https://github.com/CSolanaM/SkeletonUI",
       "state" : {
         "revision" : "f025e9ba5d051374d7344efa8859df5b9399a181",
         "version" : "2.0.2"
@@ -157,7 +157,7 @@
     {
       "identity" : "smoothgradient",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/raymondjavaxx/SmoothGradient.git",
+      "location" : "https://github.com/raymondjavaxx/SmoothGradient",
       "state" : {
         "revision" : "77ac160533ce312f92b566754731e07b20315a41",
         "version" : "1.0.1"
@@ -168,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-algorithms",
       "state" : {
-        "revision" : "9d349bcc328ac3c31ce40e746b5882742a0d1272",
-        "version" : "1.1.3"
+        "revision" : "3da39bbc4e687d4192af7c9cf4eab805745a0b9c",
+        "version" : "1.1.5"
       }
     },
     {
@@ -177,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "6989976265be3f8d2b5802c722f9ba168e227c71",
-        "version" : "1.7.2"
+        "revision" : "cb4cba6a8a46a86db0d37dbe09935ead6b24c91a",
+        "version" : "1.10.0"
       }
     },
     {
@@ -186,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-clocks",
       "state" : {
-        "revision" : "cc46202b53476d64e824e0b6612da09d84ffde8e",
-        "version" : "1.0.6"
+        "revision" : "82440fa0a8b1c381a6d1e8e0fc7bbba53ec63204",
+        "version" : "1.1.1"
       }
     },
     {
@@ -195,8 +195,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections",
       "state" : {
-        "revision" : "7b847a3b7008b2dc2f47ca3110d8c782fb2e5c7e",
-        "version" : "1.3.0"
+        "revision" : "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+        "version" : "1.6.0"
       }
     },
     {
@@ -204,8 +204,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "e2fa1df6cd9eec6fa6314aa20513e47da576f24e",
-        "version" : "1.26.0"
+        "revision" : "377da4061db10d26337a71bb279c506bb951f50f",
+        "version" : "1.26.2"
       }
     },
     {
@@ -213,8 +213,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
       "state" : {
-        "revision" : "5a3825302b1a0d744183200915a47b508c828e6f",
-        "version" : "1.3.2"
+        "revision" : "5fa253428866f2360c3754e88537f700ed2656b5",
+        "version" : "1.4.1"
       }
     },
     {
@@ -222,8 +222,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-custom-dump",
       "state" : {
-        "revision" : "b9b59eb58c946236d6f16305c576ad194c36444e",
-        "version" : "1.6.0"
+        "revision" : "4fb9e7cbb4b8f5a7354005db39447f570d6b3e19",
+        "version" : "1.7.3"
       }
     },
     {
@@ -231,8 +231,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "8dc1fbf2f6255a73dec53b4648164884898db4c5",
-        "version" : "1.14.1"
+        "revision" : "b476cc5761057d8d857de063fe7ac8daecf5c06b",
+        "version" : "1.17.1"
       }
     },
     {
@@ -245,12 +245,21 @@
       }
     },
     {
+      "identity" : "swift-issue-reporting",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-issue-reporting",
+      "state" : {
+        "revision" : "75b000cea2ca6d7527a57e1b9cc0bdf21a9abe9f",
+        "version" : "2.1.1"
+      }
+    },
+    {
       "identity" : "swift-memberwise-init-macro",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gohanlon/swift-memberwise-init-macro",
       "state" : {
-        "revision" : "47a2bdf45f1567e7324438f8482e362ee1c3fb44",
-        "version" : "0.5.2"
+        "revision" : "d0fb82bb6638051524214fb54524bfcd876735a1",
+        "version" : "0.6.0"
       }
     },
     {
@@ -258,8 +267,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "32f35241b8be0719c4c7f00eb27713b1cadb6248",
-        "version" : "2.8.0"
+        "revision" : "7e95e5e9ff0a64f6ad8bca59083f8d6ba381b6ff",
+        "version" : "2.11.2"
       }
     },
     {
@@ -267,8 +276,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-perception",
       "state" : {
-        "revision" : "25ac73741c3436605d61eceb5207e896973918e7",
-        "version" : "2.0.10"
+        "revision" : "597afd46249f4a71885b95d26b26cc5b893daf32",
+        "version" : "2.0.12"
       }
     },
     {
@@ -276,8 +285,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-sharing",
       "state" : {
-        "revision" : "c8dd3627eb92cef1bcb44ac5a93d558ab32b82ce",
-        "version" : "2.9.0"
+        "revision" : "3552faf8a6c18ce896ec5a72bd8c34755f0f03e0",
+        "version" : "2.10.1"
       }
     },
     {
@@ -285,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
       "state" : {
-        "revision" : "ad5e3190cc63dc288f28546f9c6827efc1e9d495",
-        "version" : "1.19.2"
+        "revision" : "59a99c458de4d2dee580529b61b4f78dca7b7fa6",
+        "version" : "1.19.4"
       }
     },
     {
@@ -301,25 +310,16 @@
     {
       "identity" : "swiftygif",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kirualex/SwiftyGif.git",
+      "location" : "https://github.com/kirualex/SwiftyGif",
       "state" : {
         "revision" : "4430cbc148baa3907651d40562d96325426f409a",
         "version" : "5.4.5"
       }
     },
     {
-      "identity" : "xctest-dynamic-overlay",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
-      "state" : {
-        "revision" : "401bf70d95bfe8db2a1dc619f9e175a85c089321",
-        "version" : "1.10.1"
-      }
-    },
-    {
       "identity" : "youtubeplayerkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SvenTiigi/YouTubePlayerKit.git",
+      "location" : "https://github.com/SvenTiigi/YouTubePlayerKit",
       "state" : {
         "revision" : "1ae827573024ab13dd6adea33b25d3eef6ff667c",
         "version" : "2.0.5"
@@ -328,10 +328,10 @@
     {
       "identity" : "zmarkupparser",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ZhgChgLi/ZMarkupParser.git",
+      "location" : "https://github.com/ZhgChgLi/ZMarkupParser",
       "state" : {
-        "revision" : "f25c9838e9e77ae49cc3f434ee26e669cb4043c7",
-        "version" : "1.12.0"
+        "revision" : "904c70f5d5d33080a016cca9258eff778199d57e",
+        "version" : "2.0.2"
       }
     },
     {
@@ -339,8 +339,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ZhgChgLi/ZNSTextAttachment",
       "state" : {
-        "revision" : "8c6c34e82eb31ad373b209cb88c2a2aff76c6cdf",
-        "version" : "1.1.9"
+        "revision" : "91f718caf50649d817f189eb17ad028f03fd632b",
+        "version" : "1.2.0"
       }
     }
   ],
