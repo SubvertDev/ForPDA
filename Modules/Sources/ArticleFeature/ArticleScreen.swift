@@ -22,6 +22,7 @@ public struct ArticleScreen: View {
     @Perception.Bindable public var store: StoreOf<ArticleFeature>
     @FocusState public var focus: ArticleFeature.State.Field?
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     @State private var scrollProxy: ScrollViewProxy?
     @State private var safeAreaTopHeight: CGFloat
@@ -66,7 +67,7 @@ public struct ArticleScreen: View {
                     }
                 }
                 .overlay { RefreshIndicator() }
-                .background(Color(.Background.primary))
+                .background(backgroundColors.primary)
                 .onAppear { store.send(.onAppear) }
                 .onChange(of: store.scrollToId) { _ in
                     guard let scrollId = store.scrollToId, !store.isLoading else { return }
@@ -136,7 +137,7 @@ public struct ArticleScreen: View {
     @available(iOS, deprecated: 26.0)
     @ViewBuilder
     private func ToolbarOverlay() -> some View {
-        Color(.Background.primaryAlpha)
+        backgroundColors.primaryAlpha
             .background(.ultraThinMaterial)
             .opacity(navBarOpacity)
             .frame(width: UIScreen.main.bounds.width, height: safeAreaTopHeight)
@@ -167,7 +168,7 @@ public struct ArticleScreen: View {
                             
                         } else if let elements = store.elements {
                             ArticleView(elements: elements)
-                                .background(Color(.Background.primary))
+                                .background(backgroundColors.primary)
                         }
                     }
                     .animation(.default, value: store.elements)
@@ -202,7 +203,7 @@ public struct ArticleScreen: View {
                     if let image = state.image {
                         image.resizable().scaledToFill()
                     } else {
-                        Color(.Background.forcedDark)
+                        backgroundColors.forcedDark
                     }
                 }
                 .skeleton(
@@ -210,7 +211,7 @@ public struct ArticleScreen: View {
                     appearance: .gradient(
                         .linear,
                         color: Color(.Labels.forcedLight).opacity(0.25),
-                        background: Color(.Background.forcedDark),
+                        background: backgroundColors.forcedDark,
                         radius: 1,
                         angle: .zero
                     ),
@@ -245,7 +246,7 @@ public struct ArticleScreen: View {
                     LinearGradient(
                         gradient: .smooth(
                             from: .clear,
-                            to: Color(.Background.forcedDark),
+                            to: backgroundColors.forcedDark,
                             easing: .easeInOut
                         ),
                         startPoint: .top,
@@ -284,7 +285,7 @@ public struct ArticleScreen: View {
             
             Rectangle()
                 .frame(maxWidth: .infinity, maxHeight: 16)
-                .foregroundStyle(Color(.Background.teritary))
+                .foregroundStyle(backgroundColors.tertiary)
             
             CommentsView(store: store)
                 .modifier(ScrollVisibility(threshold: 0.01, isVisible: $isCommentsViewVisible))

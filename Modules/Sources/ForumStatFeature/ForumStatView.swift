@@ -17,6 +17,7 @@ public struct ForumStatView: View {
     
     @Perception.Bindable public var store: StoreOf<ForumStatFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     // MARK: - Init
     
@@ -50,7 +51,7 @@ public struct ForumStatView: View {
                 }
                 .presentationDetents([.medium])
             }
-            .background(Color(.Background.primary))
+            .background(backgroundColors.primary)
             .safeAreaInset(edge: .bottom) {
                 if case let .topic(topic) = store.type, topic.canModerate {
                     OpenTopicHistoryButton()
@@ -183,7 +184,7 @@ public struct ForumStatView: View {
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
+        .background(backgroundColors.primary)
     }
     
     // MARK: - Header
@@ -247,7 +248,7 @@ public struct ForumStatView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(12)
         .background(
-            Color(.Background.teritary)
+            backgroundColors.tertiary
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         )
     }
@@ -276,7 +277,7 @@ public struct ForumStatView: View {
         .padding(.vertical, 9)
         .padding(.horizontal, 8)
         .background(
-            Color(.Background.teritary)
+            backgroundColors.tertiary
                 .clipShape(RoundedRectangle(cornerRadius: 8))
         )
     }

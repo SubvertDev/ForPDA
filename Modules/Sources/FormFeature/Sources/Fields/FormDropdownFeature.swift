@@ -86,6 +86,7 @@ struct FormDropdownRow: View {
     
     @Perception.Bindable var store: StoreOf<FormDropdownFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     var body: some View {
         WithPerceptionTracking {
@@ -117,14 +118,14 @@ struct FormDropdownRow: View {
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
-                                .fill(Color(.Background.teritary))
+                                .fill(backgroundColors.tertiary)
                         )
                         .overlay {
                             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
                                 .strokeBorder(Color(.Separator.primary))
                         }
                     }
-                    .listRowBackground(Color(.Background.teritary))
+                    .listRowBackground(backgroundColors.tertiary)
                 }
             }
         }

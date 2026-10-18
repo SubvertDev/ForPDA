@@ -17,6 +17,7 @@ struct FormPreviewView: View {
     @Perception.Bindable var store: StoreOf<FormPreviewFeature>
     
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     init(store: StoreOf<FormPreviewFeature>) {
         self.store = store
@@ -25,7 +26,7 @@ struct FormPreviewView: View {
     var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 ScrollView {

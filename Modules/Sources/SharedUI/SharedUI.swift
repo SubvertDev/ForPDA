@@ -5,6 +5,7 @@
 //  Created by Ilia Lubianoi on 12.05.2024.
 //
 
+import Models
 import SwiftUI
 
 //public let shared = Bundle.module
@@ -33,10 +34,64 @@ private struct TintKey: EnvironmentKey {
     static let defaultValue: Color = Color.blue
 }
 
+public struct BackgroundColors: Sendable {
+    
+    public let forcedDark: Color
+    public let primary: Color
+    public let primaryAlpha: Color
+    public let secondary: Color
+    public let tertiary: Color
+
+    public static let blue = Self(
+        forcedDark: Color(.Background.Blue.forcedDark),
+        primary: Color(.Background.Blue.primary),
+        primaryAlpha: Color(.Background.Blue.primaryAlpha),
+        secondary: Color(.Background.Blue.secondary),
+        tertiary: Color(.Background.Blue.tertiary)
+    )
+
+    public static let black = Self(
+        forcedDark: Color(.Background.Black.primary),
+        primary: Color(.Background.Black.primary),
+        primaryAlpha: Color(.Background.Black.primaryAlpha),
+        secondary: Color(.Background.Black.secondary),
+        tertiary: Color(.Background.Black.tertiary)
+    )
+
+    public static func resolve(
+        theme: BackgroundTheme,
+        appColorScheme: AppColorScheme,
+        systemColorScheme: ColorScheme
+    ) -> Self {
+        guard case .black = theme else { return .blue }
+
+        let isDark: Bool
+        switch appColorScheme {
+        case .light:
+            isDark = false
+        case .dark:
+            isDark = true
+        case .system:
+            isDark = systemColorScheme == .dark
+        }
+
+        return isDark ? .black : .blue
+    }
+}
+
+private struct BackgroundColorsKey: EnvironmentKey {
+    static let defaultValue = BackgroundColors.blue
+}
+
 public extension EnvironmentValues {
     var tintColor: Color {
         get { self[TintKey.self] }
         set { self[TintKey.self] = newValue }
+    }
+
+    var backgroundColors: BackgroundColors {
+        get { self[BackgroundColorsKey.self] }
+        set { self[BackgroundColorsKey.self] = newValue }
     }
 }
 

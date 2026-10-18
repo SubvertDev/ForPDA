@@ -17,6 +17,7 @@ public struct TopicEditView: View {
     @Perception.Bindable public var store: StoreOf<TopicEditFeature>
     @FocusState private var focus: TopicEditFeature.State.Field?
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     public init(store: StoreOf<TopicEditFeature>) {
         self.store = store
@@ -76,7 +77,7 @@ public struct TopicEditView: View {
                     .disabled(store.isSending)
                 }
             }
-            .background(Color(.Background.primary))
+            .background(backgroundColors.primary)
             .disabled(store.isSending)
             .animation(.default, value: store.isSending)
             .bind($store.focus, to: $focus)
@@ -111,7 +112,7 @@ public struct TopicEditView: View {
             .frame(height: 48)
             .padding(.vertical, 8)
             .padding(.horizontal, 16)
-            .background(Color(.Background.primary))
+            .background(backgroundColors.primary)
         }
     }
     

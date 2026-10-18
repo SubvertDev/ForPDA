@@ -21,6 +21,7 @@ public struct TicketScreen: View {
     
     @Perception.Bindable public var store: StoreOf<TicketFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     // MARK: - Init
     
@@ -33,7 +34,7 @@ public struct TicketScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -344,7 +345,7 @@ public struct TicketScreen: View {
         .padding(.vertical, 2)
         .padding(.horizontal, 6)
         .background(
-            info.status.maskColor
+            info.status.maskColor(backgroundColors: backgroundColors)
                 .clipShape(RoundedRectangle(cornerRadius: isLiquidGlass ? 10 : 6))
         )
     }
@@ -394,11 +395,11 @@ public struct TicketScreen: View {
 // MARK: - Extensions
 
 extension TicketStatus {
-    var maskColor: Color {
+    func maskColor(backgroundColors: BackgroundColors) -> Color {
         switch self {
         case .notProcessed: Color(.Main.redAlpha)
         case .processing:   Color(.Main.yellowAlpha)
-        case .processed:    Color(.Background.teritary)
+        case .processed:    backgroundColors.tertiary
         }
     }
     

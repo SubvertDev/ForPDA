@@ -17,6 +17,7 @@ public struct ForumMoveView: View {
     
     @Perception.Bindable public var store: StoreOf<ForumMoveFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     @FocusState private var focus: ForumMoveFeature.State.Field?
     
@@ -44,7 +45,7 @@ public struct ForumMoveView: View {
             .padding(.horizontal, 16)
             .background {
                 if !isLiquidGlass {
-                    Color(.Background.primary)
+                    backgroundColors.primary
                 }
             }
             ._toolbarTitleDisplayMode(.inline)

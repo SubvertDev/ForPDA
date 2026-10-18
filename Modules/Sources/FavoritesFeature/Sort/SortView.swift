@@ -17,6 +17,7 @@ struct SortView: View {
     
     @Perception.Bindable var store: StoreOf<SortFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     @State private var sortSelection: FavoriteSortType?
     @State private var sortSelections: Set<FavoriteSortType> = .init()
     
@@ -59,11 +60,11 @@ struct SortView: View {
                                 .padding(.trailing, 11)
                         }
                         .frame(height: 60)
-                        .background(Color(.Background.teritary))
+                        .background(backgroundColors.tertiary)
                         .cornerRadius(10)
                     }
                 }
-                .listRowBackground(Color(.Background.teritary))
+                .listRowBackground(backgroundColors.tertiary)
                 .padding(.bottom, 28)
                 
                 Row("In reverse order", value: $store.isReverseOrder)
@@ -98,7 +99,7 @@ struct SortView: View {
             .padding(.horizontal, 16)
             .background {
                 if !isLiquidGlass {
-                    Color(.Background.primary)
+                    backgroundColors.primary
                 }
             }
             ._toolbarTitleDisplayMode(.inline)

@@ -18,6 +18,7 @@ public struct QMSScreen: View {
     
     @Perception.Bindable public var store: StoreOf<QMSFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     // MARK: - Init
     
@@ -30,7 +31,7 @@ public struct QMSScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 if store.chat != nil {
@@ -65,7 +66,7 @@ public struct QMSScreen: View {
                         ChatTheme(
                             colors: ChatTheme
                                 .Colors(
-                                    mainBG: Color(.Background.primary),
+                                    mainBG: backgroundColors.primary,
                                     messageMyBG: Color(.Background.quaternary),
                                     messageMyText: Color(.Labels.primary),
                                     messageMyTimeText: Color(.systemGray),

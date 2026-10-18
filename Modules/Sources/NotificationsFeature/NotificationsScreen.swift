@@ -14,6 +14,7 @@ public struct NotificationsScreen: View {
     
     @Perception.Bindable public var store: StoreOf<NotificationsFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     public init(store: StoreOf<NotificationsFeature>) {
         self.store = store
@@ -22,7 +23,7 @@ public struct NotificationsScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 List {
@@ -31,7 +32,7 @@ public struct NotificationsScreen: View {
                             VStack(spacing: 8) {
                                 Text("Notifications are disabled", bundle: .module)
                                     .multilineTextAlignment(.center)
-                                    .listRowBackground(Color(.Background.teritary))
+                                    .listRowBackground(backgroundColors.tertiary)
                                     .frame(maxWidth: .infinity)
                                 
                                 Button {
@@ -52,7 +53,7 @@ public struct NotificationsScreen: View {
                         Text("General", bundle: .module)
                     }
                     .tint(tintColor)
-                    .listRowBackground(Color(.Background.teritary))
+                    .listRowBackground(backgroundColors.tertiary)
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
 //                    Section {
@@ -61,7 +62,7 @@ public struct NotificationsScreen: View {
 //                        Text("Experimental", bundle: .module)
 //                    }
 //                    .tint(tintColor)
-//                    .listRowBackground(Color(.Background.teritary))
+//                    .listRowBackground(backgroundColors.tertiary)
 //                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
                 .animation(.default, value: store.appSettings.backgroundNotifications2)

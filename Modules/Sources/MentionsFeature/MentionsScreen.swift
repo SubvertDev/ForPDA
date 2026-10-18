@@ -19,6 +19,7 @@ public struct MentionsScreen: View {
     
     @Perception.Bindable public var store: StoreOf<MentionsFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     @State private var navigationMinimized = false
     
     private var shouldShowInlineNavigation: Bool {
@@ -41,7 +42,7 @@ public struct MentionsScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 if !store.mentions.isEmpty, !store.isLoading {
@@ -60,7 +61,7 @@ public struct MentionsScreen: View {
                                 }
                             )
                         }
-                        .listRowBackground(Color(.Background.teritary))
+                        .listRowBackground(backgroundColors.tertiary)
                         
                         Navigation()
                     }
@@ -101,7 +102,7 @@ public struct MentionsScreen: View {
     private func Navigation() -> some View {
         if shouldShowInlineNavigation {
             PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
-                .listRowBackground(Color(.Background.primary))
+                .listRowBackground(backgroundColors.primary)
         }
     }
     

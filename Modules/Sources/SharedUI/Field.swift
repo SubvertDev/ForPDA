@@ -12,6 +12,7 @@ public struct Field<T: Hashable, BBPanel: View>: View {
     // MARK: - Properties
     
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     @FocusState.Binding var focus: T?
     
     var content: Binding<String>
@@ -69,7 +70,7 @@ public struct Field<T: Hashable, BBPanel: View>: View {
         .frame(minHeight: minHeight, alignment: .top)
         .background {
             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
-                .fill(Color(.Background.teritary))
+                .fill(backgroundColors.tertiary)
         }
         .overlay {
             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
@@ -139,6 +140,7 @@ public struct SingleLineField<F: Hashable>: View {
 public struct FieldContainer<F: Hashable, Content: View>: View {
     
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     @FocusState.Binding public var focus: F?
     
     let focusEqual: F
@@ -165,7 +167,7 @@ public struct FieldContainer<F: Hashable, Content: View>: View {
         .foregroundStyle(Color(.Labels.primary))
         .background {
             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
-                .fill(Color(.Background.teritary))
+                .fill(backgroundColors.tertiary)
         }
         .overlay {
             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)

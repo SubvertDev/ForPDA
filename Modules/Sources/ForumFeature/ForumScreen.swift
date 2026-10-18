@@ -24,6 +24,7 @@ public struct ForumScreen: View {
     
     @Perception.Bindable public var store: StoreOf<ForumFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     @State private var navigationMinimized = false
     
     private var shouldShowInlineNavigation: Bool {
@@ -46,7 +47,7 @@ public struct ForumScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 if let forum = store.forum, !store.isLoadingTopics {
@@ -178,10 +179,10 @@ public struct ForumScreen: View {
         .background {
             if #available(iOS 26, *) {
                 ConcentricRectangle()
-                    .fill(Color(.Background.teritary))
+                    .fill(backgroundColors.tertiary)
             } else {
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(.Background.teritary))
+                    .fill(backgroundColors.tertiary)
             }
         }
         .listRowBackground(Color.clear)
@@ -223,7 +224,7 @@ public struct ForumScreen: View {
                             }
                         }
                         .listRowBackground(
-                            Color(.Background.teritary)
+                            backgroundColors.tertiary
                                 .clipShape(.rect(
                                     topLeadingRadius: index == 0 ? radius : 0, bottomLeadingRadius: index == topics.count - 1 ? radius : 0,
                                     bottomTrailingRadius: index == topics.count - 1 ? radius : 0, topTrailingRadius: index == 0 ? radius : 0
@@ -242,7 +243,7 @@ public struct ForumScreen: View {
                 section: pinned ? .pinnedTopics : .topics
             )
         }
-        .listRowBackground(Color(.Background.teritary))
+        .listRowBackground(backgroundColors.tertiary)
     }
     
     // MARK: - Topic Context Menu
@@ -363,7 +364,7 @@ public struct ForumScreen: View {
         } header: {
             Header(title: "Subforums", section: .subforums)
         }
-        .listRowBackground(Color(.Background.teritary))
+        .listRowBackground(backgroundColors.tertiary)
     }
     
     // MARK: - Announcements section
@@ -382,7 +383,7 @@ public struct ForumScreen: View {
         } header: {
             Header(title: "Announcements", section: .announcements)
         }
-        .listRowBackground(Color(.Background.teritary))
+        .listRowBackground(backgroundColors.tertiary)
     }
     
     @ViewBuilder

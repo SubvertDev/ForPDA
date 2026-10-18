@@ -14,6 +14,7 @@ struct PollView: View {
     // MARK: - Properties
     
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     @State private var isSending = false
     @State private var showVoteResultsButtonTapped = false
@@ -196,7 +197,7 @@ struct PollView: View {
                 
                 ZStack {
                     RoundedRectangle(cornerRadius: 4)
-                        .foregroundStyle(Color(.Background.teritary))
+                        .foregroundStyle(backgroundColors.tertiary)
                         .frame(height: 18)
                     
                     HStack(spacing: 0) {

@@ -20,6 +20,7 @@ public struct FavoritesScreen: View {
     @Perception.Bindable public var store: StoreOf<FavoritesFeature>
     @State private var navigationMinimized = false
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
@@ -41,7 +42,7 @@ public struct FavoritesScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
 
                 if store.shouldShowEmptyState {
@@ -249,7 +250,7 @@ public struct FavoritesScreen: View {
                     }
                 }
                 .listRowBackground(
-                    Color(.Background.teritary)
+                    backgroundColors.tertiary
                         .clipShape(
                             .rect(
                                 topLeadingRadius: index == 0 ? radius : 0,
@@ -272,7 +273,7 @@ public struct FavoritesScreen: View {
                        : LocalizedStringKey("Topics / Forums"))
             }
         }
-        .listRowBackground(Color(.Background.teritary))
+        .listRowBackground(backgroundColors.tertiary)
     }
     
     // MARK: - Navigation

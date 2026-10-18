@@ -17,7 +17,9 @@ import GalleryFeature
 struct ArticleElementView: View {
     
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     @Environment(\.openURL) private var openURL
+    
     @State private var gallerySelection: Int = 0
     @State private var pollSelection: ArticlePoll.Option?
     @State private var pollSelections: Set<ArticlePoll.Option> = .init()
@@ -187,7 +189,7 @@ struct ArticleElementView: View {
                 Color(.systemBackground)
                     .skeleton(with: true, shape: .rectangle)
             case .error:
-                Color(.Background.teritary)
+                backgroundColors.tertiary
                     .overlay {
                         Image(.imageNotLoaded)
                             .resizable()
@@ -292,7 +294,7 @@ struct ArticleElementView: View {
                             
                             ZStack {
                                 RoundedRectangle(cornerRadius: 4)
-                                    .foregroundStyle(Color(.Background.teritary))
+                                    .foregroundStyle(backgroundColors.tertiary)
                                     .frame(height: 18)
                                 
                                 HStack(spacing: 0) {

@@ -50,9 +50,10 @@ struct CommentView: View {
     
     // MARK: - Properties
     
-    @Environment(\.tintColor) private var tintColor
-    
     @Perception.Bindable public var store: StoreOf<CommentFeature>
+    
+    @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     public init(store: StoreOf<CommentFeature>) {
         self.store = store
@@ -99,7 +100,7 @@ struct CommentView: View {
                         .padding(.bottom, 16)
                         .overlay(alignment: .topLeading) {
                             Rectangle()
-                                .foregroundStyle(Color(.Background.primary))
+                                .foregroundStyle(backgroundColors.primary)
                                 .frame(width: 128, height: 16)
                                 .offset(x: -1, y: -16)
                         }
@@ -135,7 +136,7 @@ struct CommentView: View {
             ) { store in
                 ReputationChangeView(store: store)
             }
-            .background(Color(.Background.primary))
+            .background(backgroundColors.primary)
             .alert($store.scope(\.$alert, action: \.alert))
             .task {
                 await store.send(.onTask).finish()

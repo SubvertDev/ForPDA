@@ -21,6 +21,7 @@ public struct ArticleRowView: View {
     
     @Namespace private var namespace
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     public let state: State
     public let rowType: RowType
@@ -91,7 +92,7 @@ public struct ArticleRowView: View {
             .padding(.bottom, 14)
         }
         .background(
-            Color(.Background.primary)
+            backgroundColors.primary
 //                .matchedGeometryEffect(id: "background\(id)", in: namespace)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -124,7 +125,7 @@ public struct ArticleRowView: View {
             }
         }
         .background(
-            Color(.Background.primary)
+            backgroundColors.primary
         )
     }
     
@@ -140,7 +141,7 @@ public struct ArticleRowView: View {
                         .clipped()
                         .contentShape(Rectangle())
                 } else {
-                    Color(.Background.teritary)
+                    backgroundColors.tertiary
                         .frame(maxHeight: .infinity)
                 }
             }

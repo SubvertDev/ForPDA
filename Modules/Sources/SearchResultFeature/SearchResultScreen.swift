@@ -20,6 +20,7 @@ public struct SearchResultScreen: View {
     @Perception.Bindable public var store: StoreOf<SearchResultFeature>
     
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     @State private var navigationMinimized = false
     
@@ -43,7 +44,7 @@ public struct SearchResultScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 if !store.isLoading {
@@ -75,7 +76,7 @@ public struct SearchResultScreen: View {
             }
             .navigationTitle(Text("Search", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
-            .background(Color(.Background.primary))
+            .background(backgroundColors.primary)
             .toolbar {
                 if store.search.on != .site {
                     ToolbarItem {
@@ -176,7 +177,7 @@ public struct SearchResultScreen: View {
         }
         .padding(.vertical, 12)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(post.colorMask)
+        .listRowBackground(post.colorMask(backgroundColors: backgroundColors))
         .disabled(post.topicName.isEmpty && post.isDisabled)
     }
     
@@ -198,7 +199,7 @@ public struct SearchResultScreen: View {
                 )
                 .padding(.leading, 16)
                 .background(
-                    Color(.Background.teritary)
+                    backgroundColors.tertiary
                         .clipShape(
                             .rect(
                                 topLeadingRadius: index == 0 ? radius : 0,
@@ -211,7 +212,7 @@ public struct SearchResultScreen: View {
             }
             .listSectionSeparator(.hidden)
             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color(.Background.primary))
+            .listRowBackground(backgroundColors.primary)
         }
     }
     
@@ -242,7 +243,7 @@ public struct SearchResultScreen: View {
         .padding(.bottom, 14)
         .listRowSeparator(.hidden)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(Color(.Background.primary))
+        .listRowBackground(backgroundColors.primary)
     }
     
     private func settingsToRow(_ rowType: AppSettings.ArticleListRowType) -> ArticleRowView.RowType {
@@ -254,7 +255,7 @@ public struct SearchResultScreen: View {
     @ViewBuilder
     private func Navigation() -> some View {
         PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
-            .listRowBackground(Color(.Background.primary))
+            .listRowBackground(backgroundColors.primary)
     }
     
     // MARK: - Nothing Found
@@ -298,13 +299,13 @@ extension UIContent.UIHybridPost {
         return !post.post.canModerate && (post.post.isDeleted || post.post.isHidden)
     }
     
-    var colorMask: Color {
+    func colorMask(backgroundColors: BackgroundColors) -> Color {
         return if post.post.isDeleted {
             Color(.Background.quaternary)
         } else if post.post.isHidden {
             Color(.Main.redAlpha)
         } else {
-            Color(.Background.primary)
+            backgroundColors.primary
         }
     }
 }

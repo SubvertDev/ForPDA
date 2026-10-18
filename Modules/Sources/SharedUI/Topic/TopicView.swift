@@ -265,6 +265,8 @@ public struct TopicView: View {
 
 struct SpoilerView: View {
     
+    @Environment(\.backgroundColors) private var backgroundColors
+    
     @State private var isExpanded = false
     
     let types: [UITopicType]
@@ -358,7 +360,7 @@ struct SpoilerView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.Background.primary), strokeBorder: Color(.Separator.secondary))
+                .fill(backgroundColors.primary, strokeBorder: Color(.Separator.secondary))
         )
         .animation(.default, value: isExpanded)
     }
@@ -367,6 +369,8 @@ struct SpoilerView: View {
 // MARK: - Quote View
 
 struct QuoteView: View {
+    
+    @Environment(\.backgroundColors) private var backgroundColors
     
     let types: [UITopicType]
     let nestLevel: Int
@@ -481,7 +485,7 @@ struct QuoteView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.Background.primary), strokeBorder: Color(.Separator.secondary))
+                .fill(backgroundColors.primary, strokeBorder: Color(.Separator.secondary))
         )
     }
 }
@@ -489,6 +493,8 @@ struct QuoteView: View {
 // MARK: - Code View
 
 struct CodeView: View {
+    
+    @Environment(\.backgroundColors) private var backgroundColors
     
     @State private var isExpanded = false
     
@@ -556,7 +562,7 @@ struct CodeView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.Background.primary), strokeBorder: Color(.Separator.secondary))
+                .fill(backgroundColors.primary, strokeBorder: Color(.Separator.secondary))
                 .overlay(alignment: .leading) {
                     Rectangle()
                         .fill(Color(.Main.greyAlpha))
@@ -595,6 +601,8 @@ private extension UIFont {
 // MARK: - Hide View
 
 struct HideView: View {
+    
+    @Environment(\.backgroundColors) private var backgroundColors
     
     let types: [UITopicType]
     let nestLevel: Int
@@ -676,7 +684,7 @@ struct HideView: View {
                 }
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(.Background.primary), strokeBorder: Color(.Separator.secondary))
+                        .fill(backgroundColors.primary, strokeBorder: Color(.Separator.secondary))
                 )
             }
         }
@@ -687,6 +695,8 @@ struct HideView: View {
 // MARK: - Notice View
 
 struct NoticeView: View {
+    
+    @Environment(\.backgroundColors) private var backgroundColors
     
     let types: [UITopicType]
     let nestLevel: Int
@@ -731,7 +741,7 @@ struct NoticeView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.Background.primary), strokeBorder: Color(.Separator.secondary))
+                .fill(backgroundColors.primary, strokeBorder: Color(.Separator.secondary))
                 .overlay(alignment: .leading) {
                     Rectangle()
                         .fill(info.color)

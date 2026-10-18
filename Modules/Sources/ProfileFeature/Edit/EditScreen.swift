@@ -19,6 +19,7 @@ public struct EditScreen: View {
     
     @Perception.Bindable public var store: StoreOf<EditFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     @State private var pickerItem: PhotosPickerItem?
     
@@ -31,7 +32,7 @@ public struct EditScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 List {
@@ -74,7 +75,7 @@ public struct EditScreen: View {
                         UserBirthday()
                         UserGender()
                     }
-                    .listRowBackground(Color(.Background.teritary))
+                    .listRowBackground(backgroundColors.tertiary)
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                     
                     Field(
@@ -143,7 +144,7 @@ public struct EditScreen: View {
             if #available(iOS 26, *) {
                 // No background
             } else {
-                Color(.Background.primary)
+                backgroundColors.primary
             }
         }
     }
@@ -261,7 +262,7 @@ public struct EditScreen: View {
                     }
                 }
                 .frame(width: 100, height: 100)
-                .background(Circle().foregroundColor(Color(.Background.teritary)))
+                .background(Circle().foregroundColor(backgroundColors.tertiary))
                 .padding(.bottom, 8)
             
             Text("File size should not be more that 32 kb and max 100x100 pixels", bundle: .module)

@@ -10,6 +10,8 @@ import SharedUI
 
 struct DeviceSpecificationLongEntryView: View {
     
+    @Environment(\.backgroundColors) private var backgroundColors
+    
     private let title: String
     private let content: String
     private let onCancelButtonTapped: () -> Void
@@ -33,7 +35,7 @@ struct DeviceSpecificationLongEntryView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
             if !isLiquidGlass {
-                Color(.Background.primary)
+                backgroundColors.primary
             }
         }
         ._toolbarTitleDisplayMode(.inline)

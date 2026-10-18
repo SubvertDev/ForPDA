@@ -18,6 +18,7 @@ public struct AuthScreen: View {
     
     @Perception.Bindable public var store: StoreOf<AuthFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     @FocusState public var focus: AuthFeature.State.Field?
     @State private var animateOnFocus = [false, false, false]
     @State private var safeAreaTopHeight: CGFloat = 0
@@ -37,7 +38,7 @@ public struct AuthScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -146,12 +147,12 @@ public struct AuthScreen: View {
                     .disabled(store.isLoginButtonDisabled)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                    // .background(Color(.Background.primary))
+                    // .background(backgroundColors.primary)
                     .background {
                         if #available(iOS 26, *) {
                             // No background
                         } else {
-                            Color(.Background.primary)
+                            backgroundColors.primary
                         }
                     }
                     .tint(tintColor)
@@ -240,7 +241,7 @@ public struct AuthScreen: View {
             .padding(.horizontal, 12)
             .background(
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(.Background.teritary))
+                    .fill(backgroundColors.tertiary)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14)

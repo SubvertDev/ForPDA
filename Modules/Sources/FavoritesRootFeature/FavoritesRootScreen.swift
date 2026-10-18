@@ -21,6 +21,7 @@ public struct FavoritesRootScreen: View {
     
     @Perception.Bindable public var store: StoreOf<FavoritesRootFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     // MARK: - Init
     
@@ -33,7 +34,7 @@ public struct FavoritesRootScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 VStack {

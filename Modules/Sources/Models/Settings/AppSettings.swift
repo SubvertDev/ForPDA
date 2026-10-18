@@ -102,7 +102,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.topicShowAllPostsFilter = try container.decodeIfPresent(Bool.self, forKey: .topicShowAllPostsFilter) ?? AppSettings.default.topicShowAllPostsFilter
         self.topicOpeningStrategy = try container.decodeIfPresent(TopicOpeningStrategy.self, forKey: .topicOpeningStrategy) ?? AppSettings.default.topicOpeningStrategy
         self.appColorScheme = try container.decodeIfPresent(AppColorScheme.self, forKey: .appColorScheme) ?? AppSettings.default.appColorScheme
-        self.backgroundTheme = try container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme) ?? AppSettings.default.backgroundTheme
+        self.backgroundTheme = (try? container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme)) ?? AppSettings.default.backgroundTheme
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
         self.notifications2 = try container.decodeIfPresent(NotificationsSettings2.self, forKey: .notifications2) ?? AppSettings.default.notifications2
         self.backgroundNotifications2 = try container.decodeIfPresent(Bool.self, forKey: .backgroundNotifications2) ?? AppSettings.default.backgroundNotifications2

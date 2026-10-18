@@ -40,6 +40,7 @@ public struct AppView: View {
     
     @Perception.Bindable public var store: StoreOf<AppFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.colorScheme) private var systemColorScheme
     
     let pageStore = StoreOf<PageNavigationFeature>.init(
         initialState: PageNavigationFeature.State(type: .topic),
@@ -96,6 +97,14 @@ public struct AppView: View {
             // Tint and environment should be after sheets/covers
             .tint(store.appSettings.appTintColor.asColor)
             .environment(\.tintColor, store.appSettings.appTintColor.asColor)
+            .environment(
+                \.backgroundColors,
+                .resolve(
+                    theme: store.appSettings.backgroundTheme,
+                    appColorScheme: store.appSettings.appColorScheme,
+                    systemColorScheme: systemColorScheme
+                )
+            )
             .onAppear {
                 withAnimation {
                     _ = store.send(.onAppear)
@@ -194,6 +203,7 @@ struct OldTabView: View {
     
     @Perception.Bindable var store: StoreOf<AppFeature>
     @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false]
+    @Environment(\.backgroundColors) private var backgroundColors
 
     var body: some View {
         WithPerceptionTracking {
@@ -264,7 +274,7 @@ struct OldTabView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: 84)
-        .background(Color(.Background.primary))
+        .background(backgroundColors.primary)
         .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
         .shadow(color: Color(.Labels.primary).opacity(0.15), radius: 2)
         .offset(y: 34) // TODO: Check for different screens
@@ -276,6 +286,7 @@ struct OldTabView: View {
 struct ToastView: View {
     
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     @State private var isPresented = false
     @State private var isExpanded = true
@@ -302,7 +313,7 @@ struct ToastView: View {
                             .transition(.opacity.combined(with: .move(edge: .trailing)))
                     }
                 }
-                .background(Color(.Background.primary))
+                .background(backgroundColors.primary)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .overlay {
                     RoundedRectangle(cornerRadius: 16)

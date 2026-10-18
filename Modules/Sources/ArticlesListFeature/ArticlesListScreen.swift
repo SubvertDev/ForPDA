@@ -17,6 +17,7 @@ public struct ArticlesListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
     @State private var scrollProxy: ScrollViewProxy?
+    @Environment(\.backgroundColors) private var backgroundColors
     
     // MARK: - Init
     
@@ -29,7 +30,7 @@ public struct ArticlesListScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 switch store.viewState {
@@ -58,7 +59,7 @@ public struct ArticlesListScreen: View {
             }
             .navigationTitle(Text("Articles", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
-            .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
+            .toolbarBackground(isLiquidGlass ? Color.clear : backgroundColors.primary, for: .navigationBar)
             .toolbar { Toolbar() }
             .sheet(item: $store.destination.share, id: \.self) { url in
                 // FIXME: Perceptible warning despite tracking closure
@@ -115,7 +116,7 @@ public struct ArticlesListScreen: View {
                     .padding(.bottom, 14)
                     .listRowSeparator(.hidden)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color(.Background.primary))
+                    .listRowBackground(backgroundColors.primary)
                     .onAppear {
                         guard let index = store.articles.firstIndex(of: article) else { return }
                         if store.articles.count - 5 == index {
@@ -132,7 +133,7 @@ public struct ArticlesListScreen: View {
                     .padding(.bottom, 20)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
-                    .listRowBackground(Color(.Background.primary))
+                    .listRowBackground(backgroundColors.primary)
             }
         }
         .listStyle(.plain)

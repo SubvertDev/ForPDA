@@ -30,6 +30,7 @@ public struct TopicScreen: View {
     @Perception.Bindable public var store: StoreOf<TopicFeature>
     
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     @State private var scrollProxy: ScrollViewProxy?
     @State private var scrollScale: CGFloat = 1
     @State private var showKarmaConfirmation = false
@@ -78,7 +79,7 @@ public struct TopicScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 ScrollViewReader { proxy in
@@ -411,7 +412,7 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostSeparator() -> some View {
         Rectangle()
-            .foregroundStyle(Color(.Separator.post))
+            .foregroundStyle(backgroundColors.tertiary)
             .frame(height: 10)
     }
     

@@ -17,6 +17,7 @@ public struct ForumsListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<ForumsListFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     // MARK: - Init
     
@@ -29,7 +30,7 @@ public struct ForumsListScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 if let forums = store.forums {
@@ -55,7 +56,7 @@ public struct ForumsListScreen: View {
                             } header: {
                                 Header(forumRow: forumRow)
                             }
-                            .listRowBackground(Color(.Background.teritary))
+                            .listRowBackground(backgroundColors.tertiary)
                         }
                     }
                     .scrollContentBackground(.hidden)

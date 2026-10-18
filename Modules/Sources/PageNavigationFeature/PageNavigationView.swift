@@ -20,6 +20,7 @@ public struct PageNavigation: View {
     @FocusState private var focus: PageNavigationFeature.State.Field?
     @Binding private var minimized: Bool
     @Environment(\._tabViewBottomAccessoryPlacement) var placement
+    @Environment(\.backgroundColors) private var backgroundColors
     
     // MARK: - Init
     
@@ -90,7 +91,7 @@ public struct PageNavigation: View {
                 .padding(.horizontal, 12)
                 .background(
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundStyle(Color(.Background.teritary))
+                        .foregroundStyle(backgroundColors.tertiary)
                         .if(!store.appSettings.experimentalFloatingNavigation) { content in
                             content
                                 .glassEffect(.identity)
@@ -263,7 +264,7 @@ public struct PageNavigation: View {
             .padding(.horizontal, 12)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .foregroundStyle(Color(.Background.teritary))
+                    .foregroundStyle(backgroundColors.tertiary)
             )
             .onTapGesture {
                 store.send(.onViewTapped)

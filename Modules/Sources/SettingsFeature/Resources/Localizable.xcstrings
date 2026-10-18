@@ -31,6 +31,16 @@
         }
       }
     },
+    "Background color" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цвет фона"
+          }
+        }
+      }
+    },
     "Backup connection" : {
       "localizations" : {
         "ru" : {
@@ -47,6 +57,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Основные"
+          }
+        }
+      }
+    },
+    "Black" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Black"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Черный"
           }
         }
       }
@@ -113,22 +139,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Темная"
-          }
-        }
-      }
-    },
-    "Dark.Theme" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dark"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Черный"
           }
         }
       }

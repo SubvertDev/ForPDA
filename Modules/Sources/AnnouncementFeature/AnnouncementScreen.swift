@@ -20,6 +20,7 @@ public struct AnnouncementScreen: View {
     
     @Perception.Bindable public var store: StoreOf<AnnouncementFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     private var title: String {
         return store.name ?? String(localized: "Loading...", bundle: .module)
@@ -36,7 +37,7 @@ public struct AnnouncementScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                Color(.Background.primary)
+                backgroundColors.primary
                     .ignoresSafeArea()
                 
                 if let announcement = store.announcement {
