@@ -31,10 +31,14 @@ public struct TopicScreen: View {
     
     @Environment(\.tintColor) private var tintColor
     @Environment(\.backgroundColors) private var backgroundColors
-    @State private var scrollProxy: ScrollViewProxy?
     @State private var scrollScale: CGFloat = 1
     @State private var showKarmaConfirmation = false
     @State private var navigationMinimized = false
+
+    private struct ScrollRequest: Equatable {
+        let postId: Int?
+        let isLoadingTopic: Bool
+    }
     
     // MARK: - Computed Properties
     
@@ -114,8 +118,13 @@ public struct TopicScreen: View {
                             .padding(.bottom, 16)
                         }
                         ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
-                        .onAppear {
-                            scrollProxy = proxy
+                        .task(
+                            id: ScrollRequest(
+                                postId: store.postId,
+                                isLoadingTopic: store.isLoadingTopic
+                            )
+                        ) {
+                            await scrollAndAnimate(using: proxy)
                         }
                     }
                 }
@@ -162,8 +171,6 @@ public struct TopicScreen: View {
                     .padding(.bottom, 8)
                 }
             }
-            .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }
-            .onChange(of: store.isLoadingTopic) { _ in Task { await scrollAndAnimate() } }
             .onFirstAppear {
                 send(.onFirstAppear)
             } onNextAppear: {
@@ -462,25 +469,42 @@ public struct TopicScreen: View {
     
     // MARK: - Helpers
     
-    private func scrollAndAnimate() async {
-        guard let postId = store.postId, !store.isLoadingTopic else { return }
-        
-        withAnimation { scrollProxy?.scrollTo(postId, anchor: .top) }
-        
-        Task {
-            // Wait for scroll animation
-            try? await Task.sleep(for: .seconds(0.5))
-            
-            let duration = 0.25
-            let animation = Animation.easeInOut(duration: duration)
+    @MainActor
+    private func scrollAndAnimate(using proxy: ScrollViewProxy) async {
+        guard let postId = store.postId, !store.isLoadingTopic else {
+            scrollScale = 1
+            return
+        }
+
+        // Give SwiftUI a layout pass after the post list is inserted
+        await Task.yield()
+        guard !Task.isCancelled else { return }
+
+        // Do not animate the LazyVStack while it resolves the destination geometry
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            proxy.scrollTo(postId, anchor: .top)
+        }
+
+        // Let the scroll position settle before highlighting the destination
+        await Task.yield()
+        guard !Task.isCancelled else { return }
+
+        let duration = 0.25
+        let animation = Animation.easeInOut(duration: duration)
+
+        do {
             withAnimation(animation) { scrollScale = 0.95 }
-            
-            Task {
-                try? await Task.sleep(for: .seconds(duration))
-                withAnimation(animation) { scrollScale = 1 }
-                try? await Task.sleep(for: .seconds(duration))
-                send(.finishedPostAnimation, animation: .default)
-            }
+            try await Task.sleep(for: .seconds(duration))
+            withAnimation(animation) { scrollScale = 1 }
+            try await Task.sleep(for: .seconds(duration))
+            try Task.checkCancellation()
+            send(.finishedPostAnimation)
+        } catch is CancellationError {
+            scrollScale = 1
+        } catch {
+            scrollScale = 1
         }
     }
 }
