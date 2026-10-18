@@ -70,27 +70,27 @@ let package = Package(
         ),
                 
         // TCA Dependencies
-        .package(url: "https://github.com/apple/swift-async-algorithms", exact: "1.1.5"),
+        .package(url: "https://github.com/apple/swift-async-algorithms", exact: "1.1.7"),
         .package(url: "https://github.com/pointfreeco/swift-clocks", exact: "1.1.1"),
         .package(url: "https://github.com/pointfreeco/swift-case-paths", exact: "1.10.0"),
-        .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", exact: "1.4.1"),
+        .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", exact: "1.4.3"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", exact: "1.7.3"),
         .package(url: "https://github.com/pointfreeco/swift-dependencies", exact: "1.17.1"),
         .package(url: "https://github.com/pointfreeco/swift-navigation", exact: "2.11.2"),
         .package(url: "https://github.com/pointfreeco/swift-perception", exact: "2.0.12"),
         .package(url: "https://github.com/pointfreeco/swift-sharing", exact: "2.10.1"),
 //        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", exact: "1.19.4"),
-        .package(url: "https://github.com/pointfreeco/swift-issue-reporting", exact: "2.1.1"),
+        .package(url: "https://github.com/pointfreeco/swift-issue-reporting", exact: "2.1.2"),
         .package(url: "https://github.com/pointfreeco/combine-schedulers", exact: "1.2.2"), // hotfix for IssueReporting
 
         // Other
         .package(url: "https://github.com/CSolanaM/SkeletonUI", exact: "2.0.2"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa", exact: "9.30.0"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", exact: "9.30.2"),
         .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro", exact: "0.6.0"),
         .package(url: "https://github.com/hyperoslo/Cache", exact: "7.4.0"),
         .package(url: "https://github.com/kean/Nuke", exact: "13.2.0"),
         .package(url: "https://github.com/kirualex/SwiftyGif", exact: "5.4.5"),
-        .package(url: "https://github.com/PostHog/posthog-ios", exact: "3.90.1"),
+        .package(url: "https://github.com/PostHog/posthog-ios", exact: "3.92.0"),
         .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", exact: "1.0.1"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", exact: "7.0.0"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", exact: "2.0.5"),
