@@ -38,12 +38,12 @@ class NotificationService: UNNotificationServiceExtension {
             let content = await manager.handlePushNotification(item: notification)
             
             switch content {
-            case .deliver(let title, let body):
+            case .deliver(let title, let body, let badgeCount):
                 delivery.update(interruptionLevel: .active, sound: .default)
-                delivery.finish(title: title, body: body)
+                delivery.finish(title: title, body: body, badgeCount: badgeCount)
                 
             case .suppress:
-                delivery.update(interruptionLevel: .passive, sound: nil)
+                delivery.update(interruptionLevel: .passive, sound: nil, badgeCount: nil)
                 delivery.finish()
 
                 try? await Task.sleep(for: .seconds(0.1))
@@ -80,6 +80,7 @@ private final class NotificationDelivery: @unchecked Sendable {
         handler: @escaping Handler
     ) {
         lock.lock()
+        content.badge = nil
         self.content = content
         self.handler = handler
         lock.unlock()
@@ -87,15 +88,20 @@ private final class NotificationDelivery: @unchecked Sendable {
     
     func update(
         interruptionLevel: UNNotificationInterruptionLevel,
-        sound: UNNotificationSound?
+        sound: UNNotificationSound?,
+        badgeCount: Int? = nil
     ) {
+        lock.lock()
         content?.interruptionLevel = interruptionLevel
         content?.sound = sound
+        content?.badge = badgeCount.map(NSNumber.init(value:))
+        lock.unlock()
     }
 
     func finish(
         title: String? = nil,
-        body: String? = nil
+        body: String? = nil,
+        badgeCount: Int? = nil
     ) {
         let result: (
             handler: Handler,
@@ -111,6 +117,10 @@ private final class NotificationDelivery: @unchecked Sendable {
 
             if let body {
                 content.body = body
+            }
+
+            if let badgeCount {
+                content.badge = NSNumber(value: badgeCount)
             }
 
             // Clear these before invoking the callback so only one caller can deliver the notification

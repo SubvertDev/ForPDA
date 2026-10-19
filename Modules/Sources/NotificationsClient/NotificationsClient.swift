@@ -214,34 +214,22 @@ extension NotificationsClient: DependencyKey {
             showUnreadNotifications: { unread, skipCategories in
                 @Dependency(\.analyticsClient) var analyticsClient
                 @Shared(.appSettings) var appSettings
+                @Shared(.userSession) var userSession
+                @Shared(.notificationBadgeState) var notificationBadgeState
                 
                 unreadSubject.send(unread)
                 
                 do {
                     let notifications = appSettings.notifications2
-
-                    var favoritesCount = 0
-                    if notifications.contains(.favoritesImportant) {
-                        favoritesCount += unread.favoritesImportantCount
-                    } else if notifications.contains(.favorites) {
-                        favoritesCount += unread.favoritesCount
-                    }
+                    let badgeState = NotificationBadgeState(
+                        unread: unread,
+                        settings: notifications,
+                        userID: userSession?.userId
+                    )
+                    $notificationBadgeState.withLock { $0 = badgeState }
                     
-                    // Sometimes we have more favorites in general count than in an array, so we apply min() fix
-                    favoritesCount = min(unread.favoritesUnreadCount, favoritesCount)
-                    
-                    let mentionsCount = notifications.contains(.mentions)
-                    ? (unread.siteMentionsCount + unread.forumMentionsCount)
-                    : 0
-                    
-                    var qmsCount = 0
-                    qmsCount += notifications.contains(.qms) ? unread.qmsCount : 0
-                    qmsCount += notifications.contains(.qmsSystemEvents) ? unread.qmsSystemCount : 0
-                    
-                    let totalCount = favoritesCount + mentionsCount + qmsCount
-                    
-                    logger.info("Setting app notifications badge to \(totalCount)")
-                    try await center.setBadgeCount(totalCount)
+                    logger.info("Setting app notifications badge to \(badgeState.totalCount)")
+                    try await center.setBadgeCount(badgeState.totalCount)
                 } catch {
                     analyticsClient.capture(error)
                 }
