@@ -438,7 +438,7 @@ public struct TopicScreen: View {
                 userSessionInfo: userSessionInfo,
                 canPostInTopic: store.topic?.canPost ?? false,
                 isUserAuthorized: store.isUserAuthorized,
-                isContextMenuAvailable: true
+                isContextMenuAvailable: !isNewPostPresented
             ),
             action: { action in
                 switch action {
