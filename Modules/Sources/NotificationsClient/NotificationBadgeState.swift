@@ -41,6 +41,27 @@ struct NotificationBadgeState: Codable, Equatable, Sendable {
         self.userID = userID
     }
 
+    private enum CodingKeys: String, CodingKey {
+        case totalCount
+        case qmsUnreadCounts
+        case favoriteKeys
+        case mentionKeys
+        case settings
+        case userID
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let defaultValue = Self.default
+
+        totalCount = try container.decodeIfPresent(Int.self, forKey: .totalCount) ?? defaultValue.totalCount
+        qmsUnreadCounts = try container.decodeIfPresent([Int: Int].self, forKey: .qmsUnreadCounts) ?? defaultValue.qmsUnreadCounts
+        favoriteKeys = try container.decodeIfPresent(Set<String>.self, forKey: .favoriteKeys) ?? defaultValue.favoriteKeys
+        mentionKeys = try container.decodeIfPresent(Set<String>.self, forKey: .mentionKeys) ?? defaultValue.mentionKeys
+        settings = try container.decodeIfPresent(NotificationsSettings2.self, forKey: .settings) ?? defaultValue.settings
+        userID = try container.decodeIfPresent(Int.self, forKey: .userID)
+    }
+
     init(unread: Unread, settings: NotificationsSettings2, userID: Int?) {
         self.init(
             totalCount: Self.totalCount(unread: unread, settings: settings),

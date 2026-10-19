@@ -113,7 +113,7 @@ extension NotificationsClient: DependencyKey {
             
             delegate: {
                 AsyncStream { continuation in
-                    let delegate = Delegate(continuation: continuation)
+                    let delegate = Delegate(continuation: continuation, manager: manager)
                     center.delegate = delegate
                     continuation.onTermination = { _ in
                         _ = delegate
@@ -296,14 +296,19 @@ extension NotificationsClient {
     fileprivate final class Delegate: NSObject, Sendable, UNUserNotificationCenterDelegate {
         
         let continuation: AsyncStream<UNNotificationSnapshot>.Continuation
+        private let manager: NotificationManager
         private nonisolated(unsafe) var lastNotificationId: String = ""
                 
         enum NotificationType {
             case socket, remote
         }
         
-        init(continuation: AsyncStream<UNNotificationSnapshot>.Continuation) {
+        init(
+            continuation: AsyncStream<UNNotificationSnapshot>.Continuation,
+            manager: NotificationManager
+        ) {
             self.continuation = continuation
+            self.manager = manager
         }
         
         // Called when notification will be presented in foreground
@@ -334,6 +339,11 @@ extension NotificationsClient {
             analytics.capturePushNotificationOpened(response)
             
             let snapshot = UNNotificationSnapshot(response.notification)
+
+            if let identifier = snapshot.pdaIdentifier {
+                manager.markHandled(identifier)
+            }
+
             continuation.yield(snapshot)
         }
     }
@@ -363,7 +373,7 @@ public struct UNNotificationSnapshot: Sendable {
         subtitle = content.subtitle
         body = content.body
         
-        pdaIdentifier = .init(userInfo: content.userInfo)
+        pdaIdentifier = .init(userInfo: content.userInfo) ?? .init(rawValue: identifier)
     }
 }
 

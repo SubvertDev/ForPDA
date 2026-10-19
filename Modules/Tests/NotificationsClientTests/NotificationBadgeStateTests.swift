@@ -204,6 +204,102 @@ struct NotificationBadgeStateTests {
     }
 }
 
+@Suite("Notification cache")
+struct NotificationsCacheTests {
+
+    @Test("All notification kinds can be marked as handled")
+    func markHandled() {
+        var cache = NotificationsCache.default
+
+        let identifiers = [
+            identifier(kind: .qmsMessage, primaryID: 1, value: 10),
+            identifier(kind: .newTopic, primaryID: 2, value: 20),
+            identifier(kind: .newPost, primaryID: 3, value: 30),
+            identifier(kind: .forumMention, primaryID: 4, value: 40),
+            identifier(kind: .siteMention, primaryID: 5, value: 50),
+        ]
+
+        expectDifference(cache) {
+            for identifier in identifiers {
+                cache.markHandled(identifier)
+            }
+        } changes: {
+            $0.qms[1] = 10
+            $0.forums[2] = 20
+            $0.topics[3] = 30
+            $0.forumMentions[4] = 40
+            $0.siteMentions[5] = 50
+        }
+
+        for identifier in identifiers {
+            expectNoDifference(cache.isHandled(identifier), true)
+        }
+
+        let handledCache = cache
+        for identifier in identifiers {
+            cache.markHandled(identifier)
+        }
+        expectNoDifference(cache, handledCache)
+    }
+
+    @Test("Existing cache files decode with empty mention caches")
+    func decodingMigration() throws {
+        struct LegacyNotificationsCache: Encodable {
+            var forums: [Int: Int]
+            var topics: [Int: Int]
+            var qms: [Int: Int]
+        }
+
+        let data = try JSONEncoder().encode(
+            LegacyNotificationsCache(
+                forums: [1: 10],
+                topics: [2: 20],
+                qms: [3: 30]
+            )
+        )
+
+        let cache = try JSONDecoder().decode(NotificationsCache.self, from: data)
+
+        expectNoDifference(
+            cache,
+            NotificationsCache(
+                forums: [1: 10],
+                topics: [2: 20],
+                qms: [3: 30]
+            )
+        )
+    }
+
+    @Test("Clearing the cache includes mentions")
+    func clearCache() {
+        var cache = NotificationsCache(
+            forums: [1: 10],
+            topics: [2: 20],
+            qms: [3: 30],
+            forumMentions: [4: 40],
+            siteMentions: [5: 50]
+        )
+
+        expectDifference(cache) {
+            cache.clearCache()
+        } changes: {
+            $0.forums.removeAll()
+            $0.topics.removeAll()
+            $0.qms.removeAll()
+            $0.forumMentions.removeAll()
+            $0.siteMentions.removeAll()
+        }
+    }
+
+    private func identifier(
+        kind: PDANotification.Kind,
+        primaryID: Int,
+        value: Int
+    ) -> PDANotification.Identifier {
+        PDANotification.Identifier(kind: kind, primaryID: primaryID, value: value)
+    }
+}
+
 private extension NotificationBadgeStateTests {
 
     func qms(

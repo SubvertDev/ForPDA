@@ -101,6 +101,11 @@ public final class NotificationManager: @unchecked Sendable {
             }
         }
     }
+
+    public func markHandled(_ identifier: PDANotification.Identifier) {
+        @Shared(.notificationsCache) var notificationsCache
+        $notificationsCache.withLock { $0.markHandled(identifier) }
+    }
     
     public func clear(by type: NotificationClearType) async {
         let notifications = await center.deliveredNotifications()
@@ -282,6 +287,13 @@ public final class NotificationManager: @unchecked Sendable {
             return true
             
         case .forumMention, .siteMention:
+            let identifier = item.toRaw().identifier
+            guard !notificationsCache.isHandled(identifier) else {
+                return false
+            }
+
+            $notificationsCache.withLock { $0.markHandled(identifier) }
+
             // Check for app notification settings
             guard settings.contains(.mentions) else {
                 return false
