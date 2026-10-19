@@ -17,6 +17,7 @@ public struct ForumMergeView: View {
     
     @Perception.Bindable public var store: StoreOf<ForumMergeFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.backgroundColors) private var backgroundColors
     
     // MARK: - Init
     
@@ -66,7 +67,7 @@ public struct ForumMergeView: View {
             ._safeAreaBar(edge: .bottom) {
                 MergeButton()
             }
-            .background(Color(.Background.primary))
+            .background(backgroundColors.primary)
             .onAppear {
                 send(.onAppear)
             }
@@ -95,7 +96,7 @@ public struct ForumMergeView: View {
         }
         .listSectionSeparator(.hidden)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(Color(.Background.primary))
+        .listRowBackground(backgroundColors.primary)
         
         Section {
             ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
@@ -124,7 +125,7 @@ public struct ForumMergeView: View {
                 )
                 .padding(.leading, 16)
                 .background(
-                    Color(.Background.teritary)
+                    backgroundColors.tertiary
                         .clipShape(
                             .rect(
                                 topLeadingRadius: index == 0 ? radius : 0,
@@ -137,7 +138,7 @@ public struct ForumMergeView: View {
             }
             .listSectionSeparator(.hidden)
             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color(.Background.primary))
+            .listRowBackground(backgroundColors.primary)
         }
     }
     
@@ -158,7 +159,7 @@ public struct ForumMergeView: View {
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
+        .background(backgroundColors.primary)
     }
 
     // MARK: - Header
@@ -187,7 +188,7 @@ public struct ForumMergeView: View {
                 .padding(.trailing, 11)
         }
         .frame(minHeight: 60)
-        .background(Color(.Background.teritary))
+        .background(backgroundColors.tertiary)
         .cornerRadius(isLiquidGlass ? 28 : 14)
     }
 }
