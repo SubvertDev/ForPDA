@@ -1,0 +1,56 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Error merging topics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка объединения тем"
+          }
+        }
+      }
+    },
+    "Merge" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Объединить"
+          }
+        }
+      }
+    },
+    "Merger" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Объединение"
+          }
+        }
+      }
+    },
+    "Selected Topics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранные темы"
+          }
+        }
+      }
+    },
+    "Target Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Главная тема"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

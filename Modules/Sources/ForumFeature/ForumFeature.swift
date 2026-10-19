@@ -17,6 +17,7 @@ import TCAExtensions
 import ToastClient
 import FormFeature
 import ForumStatFeature
+import ForumMergeFeature
 import ForumMoveFeature
 import TopicEditFeature
 import NotificationsClient
@@ -56,14 +57,38 @@ public struct ForumFeature: Reducer, Sendable {
         }
     }
     
+    public enum MultiSelectionMode: Equatable {
+        case topics
+        case pinnedTopics
+    }
+    
     // MARK: - Destinations
     
     @Reducer
     public enum Destination {
+        @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
+        
         case form(FormFeature)
         case move(ForumMoveFeature)
 		case stat(ForumStatFeature)
         case edit(TopicEditFeature)
+        case merge(ForumMergeFeature)
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+            case form(FormFeature.Action)
+            case move(ForumMoveFeature.Action)
+            case stat(ForumStatFeature.Action)
+            case edit(TopicEditFeature.Action)
+            case merge(ForumMergeFeature.Action)
+        }
+        
+        @CasePathable
+        public enum Alert: Equatable {
+            case deleteTopics([Int])
+        }
     }
     
     // MARK: - State
@@ -84,6 +109,11 @@ public struct ForumFeature: Reducer, Sendable {
         public var topicsPinned: [TopicInfo] = []
         public var sectionsExpandState = SectionExpand()
         
+        public var selectedTopics: Set<TopicInfo> = []
+        public var selectedTopicsPinned: Set<TopicInfo> = []
+        
+        public var multiSelectionMode: MultiSelectionMode?
+        
         public var isLoadingTopics = false
         public var isRefreshing = false
         
@@ -93,6 +123,17 @@ public struct ForumFeature: Reducer, Sendable {
             return userSession != nil
         }
         
+        public var isMultiSelectionMode: Bool {
+            return multiSelectionMode != nil
+        }
+        
+        public var isMultiSelectionMenuDisabled: Bool {
+            if multiSelectionMode == .pinnedTopics {
+                selectedTopicsPinned.count < 2
+            } else {
+                selectedTopics.count < 2
+            }
+        }
         
         public init(
             forumId: Int,
@@ -123,10 +164,12 @@ public struct ForumFeature: Reducer, Sendable {
             case announcementTapped(id: Int, name: String)
             case globalAnnouncementUrlTapped(URL)
             case sectionExpandTapped(SectionExpand.Kind)
+            case topicSelectionTapped(TopicInfo)
+            case disableMultiSelectionModeButtonTapped
             
             case contextOptionMenu(ForumOptionContextMenuAction)
             case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
-            case contextTopicToolsMenu(ForumTopicToolsContextMenuAction)
+            case contextTopicToolsMenu(ForumTopicToolsContextMenuAction, ForumTopicToolsContextMenuAction.TopicId)
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
         
@@ -176,10 +219,25 @@ public struct ForumFeature: Reducer, Sendable {
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
                 
+            case let .destination(.presented(.merge(.delegate(.openTopic(id))))):
+                return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
             case let .destination(.presented(.move(.delegate(.openForum(id))))):
                 return .run { send in
                     await toastClient.showToast(ToastMessage(text: Localization.topicMoved, haptic: .success))
+                    await send(.view(.disableMultiSelectionModeButtonTapped))
                     await send(.delegate(.openForum(id: id, name: nil)))
+                }
+                
+            case let .destination(.presented(.alert(.deleteTopics(ids)))):
+                return .run { send in
+                    let status = try await apiClient.modifyForum(ids: ids, type: .topic(.delete), isUndo: false)
+                    await send(.view(.disableMultiSelectionModeButtonTapped))
+                    await send(.internal(.refresh))
+                    await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                } catch: { error, send in
+                    analyticsClient.capture(error)
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
                 
             case .destination(.presented(.edit(.delegate(.topicEdited)))):
@@ -262,6 +320,10 @@ public struct ForumFeature: Reducer, Sendable {
                 case .open:
                     return .send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: .first)))
                     
+                case .select: // use only original id
+                    state.multiSelectionMode = topic.isPinned ? .pinnedTopics : .topics
+                    return .send(.view(.topicSelectionTapped(topic)))
+                    
                 case .goToEnd:
                     return .run { send in
                         await send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: .unread)))
@@ -279,24 +341,38 @@ public struct ForumFeature: Reducer, Sendable {
                     return .none
                 }
                 
-            case let .view(.contextTopicToolsMenu(action)):
+            case let .view(.contextTopicToolsMenu(action, topicId)):
+                let topics = switch topicId {
+                case let .id(topic): [topic]
+                case let .multi(pinned):
+                    Array(pinned ? state.selectedTopicsPinned : state.selectedTopics)
+                }
+                let topicIds = topics.map { $0.id }
                 switch action {
-                case .move(let topicId):
-                    state.destination = .move(ForumMoveFeature.State(type: .topic(topicId)))
+                case .move:
+                    state.destination = .move(ForumMoveFeature.State(type: .topics(topicIds)))
                     return .none
                     
-                case .modify(let action, let topicId, let isUndo):
-                    return .run { send in
-                        let status = try await apiClient.modifyForum(
-                            ids: [topicId],
-                            type: .topic(action),
-                            isUndo: isUndo
-                        )
-                        await send(.internal(.refresh))
-                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
-                    } catch: { error, send in
-                        analyticsClient.capture(error)
-                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                case .merge:
+                    state.destination = .merge(ForumMergeFeature.State(type: .topics(topics)))
+                    return .none
+                    
+                case .modify(let action, let isUndo):
+                    switch action {
+                    case .delete:
+                        state.destination = .alert(.deleteTopicsConfirmation(ids: topicIds))
+                        return .none
+                        
+                    default:
+                        return .run { send in
+                            let status = try await apiClient.modifyForum(topicIds, .topic(action), isUndo)
+                            await send(.view(.disableMultiSelectionModeButtonTapped))
+                            await send(.internal(.refresh))
+                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                        } catch: { error, send in
+                            analyticsClient.capture(error)
+                            await toastClient.showToast(.whoopsSomethingWentWrong)
+                        }
                     }
                 }
                 
@@ -343,6 +419,28 @@ public struct ForumFeature: Reducer, Sendable {
                         await toastClient.showToast(.whoopsSomethingWentWrong)
                     }
                 }
+                
+            case .view(.disableMultiSelectionModeButtonTapped):
+                state.multiSelectionMode = nil
+                state.selectedTopicsPinned = []
+                state.selectedTopics = []
+                return .none
+
+            case let .view(.topicSelectionTapped(topic)):
+                if topic.isPinned {
+                    if !state.selectedTopicsPinned.contains(topic) {
+                        state.selectedTopicsPinned.insert(topic)
+                    } else {
+                        state.selectedTopicsPinned.remove(topic)
+                    }
+                } else {
+                    if !state.selectedTopics.contains(topic) {
+                        state.selectedTopics.insert(topic)
+                    } else {
+                        state.selectedTopics.remove(topic)
+                    }
+                }
+                return .none
                 
             case .internal(.refresh):
                 state.isRefreshing = true
@@ -416,3 +514,28 @@ public struct ForumFeature: Reducer, Sendable {
     }
 
 extension ForumFeature.Destination.State: Equatable {}
+
+// MARK: - Alert Extension
+
+extension AlertState where Action == ForumFeature.Destination.Alert {
+    
+    nonisolated static func deleteTopicsConfirmation(ids: [Int]) -> AlertState {
+        return AlertState(
+            title: {
+                if ids.count > 1 {
+                    TextState("Are you sure, that you want to delete this \(ids.count) topics?", bundle: .module)
+                } else {
+                    TextState("Are you sure, that you want to delete this topic?", bundle: .module)
+                }
+            },
+            actions: {
+                ButtonState(role: .destructive, action: .deleteTopics(ids)) {
+                    TextState("Yes", bundle: .module)
+                }
+                ButtonState(role: .cancel) {
+                    TextState("No", bundle: .module)
+                }
+            }
+        )
+    }
+}

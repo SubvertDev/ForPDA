@@ -20,7 +20,7 @@ public struct ForumMoveFeature: Reducer, Sendable {
     // MARK: - Localization
     
     private enum Localization {
-        static let errorMovingTopic = LocalizedStringResource("Error moving topic", bundle: .module)
+        static let errorMovingTopics = LocalizedStringResource("Error moving topics", bundle: .module)
         static let errorMovingPosts = LocalizedStringResource("Error moving posts", bundle: .module)
     }
     
@@ -76,11 +76,11 @@ public struct ForumMoveFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
-            case movePosts([Int], toTopicid: Int)
-            case moveTopic(Int, toForumid: Int)
+            case movePosts([Int], toTopicId: Int)
+            case moveTopics([Int], toForumId: Int)
             
             case movePostsResponse(Result<(Bool, Int), any Error>)
-            case moveTopicResponse(Result<(Bool, Int), any Error>)
+            case moveTopicsResponse(Result<(Bool, Int), any Error>)
         }
         
         case delegate(Delegate)
@@ -126,14 +126,14 @@ public struct ForumMoveFeature: Reducer, Sendable {
                             state.error = .unableToExtractTopicId
                             break
                         }
-                        return .send(.internal(.movePosts(ids, toTopicid: topicId)))
+                        return .send(.internal(.movePosts(ids, toTopicId: topicId)))
                         
                     case .forum(let forumId, _):
-                        guard case .topic(let topicId) = state.type else {
+                        guard case .topics(let ids) = state.type else {
                             state.error = .needTopicUrl
                             break
                         }
-                        return .send(.internal(.moveTopic(topicId, toForumid: forumId)))
+                        return .send(.internal(.moveTopics(ids, toForumId: forumId)))
                         
                     default:
                         state.error = .badURL
@@ -146,23 +146,19 @@ public struct ForumMoveFeature: Reducer, Sendable {
             case let .internal(.movePosts(ids, toTopicId)):
                 state.isSending = true
                 return .run { send in
-                    let status = try await apiClient.movePosts(ids: ids, toTopicId: toTopicId)
+                    let status = try await apiClient.movePosts(ids, toTopicId)
                     await send(.internal(.movePostsResponse(.success((status, toTopicId: toTopicId)))))
                 } catch: { error, send in
                     await send(.internal(.movePostsResponse(.failure(error))))
                 }
                 
-            case let .internal(.moveTopic(topicId, toForumId)):
+            case let .internal(.moveTopics(ids, toForumId)):
                 state.isSending = true
                 return .run { [saveLink = state.isSaveLinkForTopic] send in
-                    let status = try await apiClient.moveTopic(
-                        id: topicId,
-                        toForumId: toForumId,
-                        saveLink: saveLink
-                    )
-                    await send(.internal(.moveTopicResponse(.success((status, toForumId: toForumId)))))
+                    let status = try await apiClient.moveTopics(ids, toForumId, saveLink)
+                    await send(.internal(.moveTopicsResponse(.success((status, toForumId: toForumId)))))
                 } catch: { error, send in
-                    await send(.internal(.moveTopicResponse(.failure(error))))
+                    await send(.internal(.moveTopicsResponse(.failure(error))))
                 }
                 
             case let .internal(.movePostsResponse(.success((status, toTopicId)))):
@@ -181,18 +177,18 @@ public struct ForumMoveFeature: Reducer, Sendable {
                     }
                 )
                 
-            case let .internal(.moveTopicResponse(.success((status, toForumId)))):
+            case let .internal(.moveTopicsResponse(.success((status, toForumId)))):
                 if status {
                     return .send(.delegate(.openForum(toForumId)))
                 }
-                return .send(.internal(.moveTopicResponse(.failure(NSError(domain: "MT", code: -1)))))
+                return .send(.internal(.moveTopicsResponse(.failure(NSError(domain: "MT", code: -1)))))
                 
-            case let .internal(.moveTopicResponse(.failure(error))):
+            case let .internal(.moveTopicsResponse(.failure(error))):
                 print(error)
                 return .merge(
                     .run { _ in await dismiss() },
                     .run { _ in
-                        let toast = ToastMessage(text: Localization.errorMovingTopic, isError: true)
+                        let toast = ToastMessage(text: Localization.errorMovingTopics, isError: true)
                         await toastClient.showToast(toast)
                     }
                 )

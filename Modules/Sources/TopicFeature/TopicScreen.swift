@@ -186,8 +186,10 @@ public struct TopicScreen: View {
         Menu {
             if let topic = store.topic, store.isUserAuthorized, topic.canPost {
                 Section {
-                    ContextButton(text: LocalizedStringResource("Write Post", bundle: .module), symbol: .plusCircle) {
-                        send(.contextMenu(.writePost))
+                    if topic.canCreateSimplePost {
+                        ContextButton(text: LocalizedStringResource("Write Post", bundle: .module), symbol: .plusCircle) {
+                            send(.contextMenu(.writePost))
+                        }
                     }
                     
                     if let postTemplate = topic.postTemplateName {

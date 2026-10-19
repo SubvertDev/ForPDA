@@ -344,7 +344,7 @@ public struct FormFeature: Reducer, Sendable {
                     }
 
                     let isMarkedPair = editor.flag == combinedFieldFlag && uploadBox.flag == combinedFieldFlag
-                    let isAdjacentPair = index == editorId + 1
+                    let isAdjacentPair = index == editorId - 1
                     guard isMarkedPair || isAdjacentPair else { continue }
 
                     uploadBoxesByEditorId[editorId] = FormStickedUploadBox(

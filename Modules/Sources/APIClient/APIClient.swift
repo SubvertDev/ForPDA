@@ -71,7 +71,8 @@ public struct APIClient: Sendable {
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
     public var modifyForum: @Sendable (_ ids: [Int], _ type: ForumModifyType, _ isUndo: Bool) async throws -> Bool
-    public var moveTopic: @Sendable (_ id: Int, _ toForumId: Int, _ saveLink: Bool) async throws -> Bool
+    public var moveTopics: @Sendable (_ ids: [Int], _ toForumId: Int, _ saveLink: Bool) async throws -> Bool
+    public var mergeTopics: @Sendable (_ ids: [Int], _ targetId: Int) async throws -> Int
     public var editTopic: @Sendable (_ data: TopicEditRequest) async throws -> TopicEditResponse
     public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
     public var setTopicCurator: @Sendable (_ topicId: Int, _ userId: Int, _ reason: String) async throws -> Bool
@@ -406,7 +407,7 @@ extension APIClient: DependencyKey {
             },
             
             markRead: { id, isTopic in
-                let command = ForumCommand.markRead(id: id, isTopic: isTopic)
+                let command = ForumCommand.markRead(ids: [id], isTopics: isTopic)
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
@@ -437,15 +438,24 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
-            moveTopic: { id, toForumId, saveLink in
+            moveTopics: { ids, toForumId, saveLink in
                 let command = ForumCommand.Topic.move(
-                    id: id,
+                    ids: ids,
                     toForumId: toForumId,
                     saveLink: saveLink
                 )
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
+            },
+            mergeTopics: { ids, targetId in
+                let command = ForumCommand.Topic.merge(
+                    ids: ids,
+                    targetId: targetId
+                )
+                let response = try await api.send(command)
+                let topicId = Int(response.getResponseComponent(number: 2))!
+                return topicId
             },
             editTopic: { data in
                 let request = PDAPI.TopicEditRequest(
@@ -467,8 +477,8 @@ extension APIClient: DependencyKey {
                 return try await parser.parseTopicViewers(response)
             },
             setTopicCurator: { topicId, userId, reason in
-                let command = ForumCommand.Topic.setCurator(
-                    topicId: topicId,
+                let command = ForumCommand.Topic.curator(
+                    topicIds: [topicId],
                     memberId: userId,
                     reason: reason
                 )
@@ -601,7 +611,7 @@ extension APIClient: DependencyKey {
             
             setFavorite: { request in
                 let command = MemberCommand.Favorites.modify(
-                    id: request.id,
+                    ids: [request.id],
                     type: request.transferType,
                     action: request.transferAction
                 )
@@ -841,8 +851,11 @@ extension APIClient: DependencyKey {
             modifyForum: { _, _, _ in
                 return true
             },
-            moveTopic: { _, _, _ in
+            moveTopics: { _, _, _ in
                 return true
+            },
+            mergeTopics: { _, _ in
+                return 1
             },
             editTopic: { _ in
                 return .success
@@ -1024,9 +1037,13 @@ extension DependencyValues {
 
 extension String {
     func getResponseStatus() -> String {
+        return getResponseComponent(number: 1)
+    }
+    
+    func getResponseComponent(number: Int) -> String {
         return self
             .replacingOccurrences(of: "[", with: "")
             .replacingOccurrences(of: "]", with: "")
-            .components(separatedBy: ",")[1]
+            .components(separatedBy: ",")[number]
     }
 }
