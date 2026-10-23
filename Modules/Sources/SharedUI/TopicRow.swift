@@ -11,6 +11,8 @@ import RichTextKit
 
 public struct TopicRow: View {
     
+    // MARK: - Properties
+    
     @Environment(\.tintColor) private var tintColor
     
     public let title: UITitleType
@@ -22,6 +24,8 @@ public struct TopicRow: View {
     public let isHatUpdated: Bool
     public let hasHatUpdateTracking: Bool
     public let onAction: (_ unreadTapped: Bool) -> Void
+    
+    // MARK: - Init
     
     public init(
         title: UITitleType,
@@ -44,6 +48,8 @@ public struct TopicRow: View {
         self.hasHatUpdateTracking = hasHatUpdateTracking
         self.onAction = onAction
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         Button {
@@ -133,6 +139,8 @@ public struct TopicRow: View {
         .frame(minHeight: 60)
     }
 }
+
+// MARK: - Previews
 
 #Preview {
     List {

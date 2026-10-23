@@ -233,6 +233,9 @@ public struct FavoritesFeature: Reducer, Sendable {
                 
             case let .view(.topicContextMenu(action, favorite)):
                 switch action {
+                case .goToFirst:
+                    return .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .first)))
+                    
                 case .goToEnd:
                     return .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .last)))
 

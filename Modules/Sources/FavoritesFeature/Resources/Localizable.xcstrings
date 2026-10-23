@@ -111,6 +111,16 @@
         }
       }
     },
+    "Go To First" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти в начало"
+          }
+        }
+      }
+    },
     "Important" : {
       "localizations" : {
         "ru" : {

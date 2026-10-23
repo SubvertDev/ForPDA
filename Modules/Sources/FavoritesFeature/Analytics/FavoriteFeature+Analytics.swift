@@ -63,6 +63,8 @@ extension FavoritesFeature {
                     
                 case let .view(.topicContextMenu(option, favorite)):
                     switch option {
+                    case .goToFirst:
+                        analytics.log(FavoritesEvent.goToFirst(favorite.topic.id))
                     case .goToEnd:
                         analytics.log(FavoritesEvent.goToEnd(favorite.topic.id))
                     case let .notify(flag, notify):

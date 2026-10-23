@@ -160,11 +160,21 @@ public struct FavoritesScreen: View {
     private func TopicContextMenu(favorite: FavoriteInfo) -> some View {
         VStack(spacing: 0) {
             Section {
-                ContextButton(
-                    text: LocalizedStringResource("Go To End", bundle: .module),
-                    symbol: .chevronRight2
-                ) {
-                    send(.topicContextMenu(.goToEnd, favorite))
+                switch store.appSettings.topicOpeningStrategy {
+                case .first:
+                    ContextButton(
+                        text: LocalizedStringResource("Go To End", bundle: .module),
+                        symbol: .chevronRight2
+                    ) {
+                        send(.topicContextMenu(.goToEnd, favorite))
+                    }
+                case .last, .unread:
+                    ContextButton(
+                        text: LocalizedStringResource("Go To First", bundle: .module),
+                        symbol: .chevronRight2
+                    ) {
+                        send(.topicContextMenu(.goToFirst, favorite))
+                    }
                 }
                 
                 ContextButton(
