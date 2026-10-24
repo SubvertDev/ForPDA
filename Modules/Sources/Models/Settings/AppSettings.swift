@@ -26,7 +26,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var backgroundTheme: BackgroundTheme
     public var appTintColor: AppTintColor
     public var notifications2: NotificationsSettings2
-    public var backgroundNotifications2: Bool
+    public var notificationsDeliveryMethod: NotificationsDeliveryMethod
     public var backupServer: Bool
     public var tickets: TicketsSettings
     public var favorites: FavoritesSettings
@@ -52,7 +52,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         backgroundTheme: BackgroundTheme,
         appTintColor: AppTintColor,
         notifications2: NotificationsSettings2,
-        backgroundNotifications2: Bool,
+        notificationsDeliveryMethod: NotificationsDeliveryMethod,
         backupServer: Bool,
         tickets: TicketsSettings,
         favorites: FavoritesSettings,
@@ -77,7 +77,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.backgroundTheme = backgroundTheme
         self.appTintColor = appTintColor
         self.notifications2 = notifications2
-        self.backgroundNotifications2 = backgroundNotifications2
+        self.notificationsDeliveryMethod = notificationsDeliveryMethod
         self.backupServer = backupServer
         self.tickets = tickets
         self.favorites = favorites
@@ -105,7 +105,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.backgroundTheme = (try? container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme)) ?? AppSettings.default.backgroundTheme
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
         self.notifications2 = try container.decodeIfPresent(NotificationsSettings2.self, forKey: .notifications2) ?? AppSettings.default.notifications2
-        self.backgroundNotifications2 = try container.decodeIfPresent(Bool.self, forKey: .backgroundNotifications2) ?? AppSettings.default.backgroundNotifications2
+        self.notificationsDeliveryMethod = try container.decodeIfPresent(NotificationsDeliveryMethod.self, forKey: .notificationsDeliveryMethod) ?? AppSettings.default.notificationsDeliveryMethod
         self.backupServer = try container.decodeIfPresent(Bool.self, forKey: .backupServer) ?? AppSettings.default.backupServer
         self.tickets = try container.decodeIfPresent(TicketsSettings.self, forKey: .tickets) ?? AppSettings.default.tickets
         self.favorites = try container.decodeIfPresent(FavoritesSettings.self, forKey: .favorites) ?? AppSettings.default.favorites
@@ -135,7 +135,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
             "backgroundTheme": backgroundTheme._rawValue,
             "appTintColor": appTintColor._rawValue,
             "notifications2": notifications2.rawValue,
-            "backgroundNotifications": backgroundNotifications2,
+            "notificationsDeliveryMethod": notificationsDeliveryMethod.description,
             "backupServer": backupServer,
             "tickets": tickets.asDictionary(),
             "favorites": favorites.asDictionary(),
@@ -159,7 +159,7 @@ public extension AppSettings {
         backgroundTheme: .blue,
         appTintColor: .primary,
         notifications2: .default,
-        backgroundNotifications2: true,
+        notificationsDeliveryMethod: .push,
         backupServer: false,
         tickets: .default,
         favorites: .default,

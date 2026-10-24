@@ -442,7 +442,8 @@ public struct AppFeature: Reducer, Sendable {
                 // MARK: - ScenePhase
                 
             case let .scenePhaseDidChange(from: _, to: newPhase):
-                return .run { [isLoggedIn = state.userSession != nil] send in
+                let isLoggedIn = state.userSession != nil
+                return .run { send in
                     if newPhase == .active {
                         try? await apiClient.connect(inBackground: false)
                         notificationCenter.post(name: .sceneBecomeActive, object: nil)
@@ -454,16 +455,17 @@ public struct AppFeature: Reducer, Sendable {
                     }
                     
                     if newPhase == .background {
-//                        if isLoggedIn {
-//                            await send(.registerBackgroundTask)
-//                        }
+                        if isLoggedIn {
+                            await send(.registerBackgroundTask)
+                        }
                         await apiClient.disconnect()
                     }
                 }
                 
             case .registerBackgroundTask:
                 // return .send(.syncUnreadTaskInvoked) // For test purposes
-                guard state.appSettings.backgroundNotifications2 else { return .none }
+                guard state.userSession != nil else { return .none }
+                guard state.appSettings.notificationsDeliveryMethod == .background else { return .none }
                 
                 let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
                 request.earliestBeginDate = .now.addingTimeInterval(15 * 60) // 15 minutes by default
@@ -478,6 +480,16 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case .backgroundTaskInvoked:
+                guard state.userSession != nil else { return .none }
+                
+                switch state.appSettings.notificationsDeliveryMethod {
+                case .push:
+                    BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: state.notificationsId)
+                    return .none
+                case .background:
+                    break
+                }
+                
                 return .run { [appSettings = state.appSettings] send in
                     do {
                         

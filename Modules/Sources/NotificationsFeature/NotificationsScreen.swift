@@ -56,20 +56,21 @@ public struct NotificationsScreen: View {
                     .listRowBackground(backgroundColors.tertiary)
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
-//                    Section {
-//                        Row("Background notifications", value: Binding(store.$appSettings.backgroundNotifications2))
-//                    } header: {
-//                        Text("Experimental", bundle: .module)
-//                    }
-//                    .tint(tintColor)
-//                    .listRowBackground(backgroundColors.tertiary)
-//                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                    Section {
+                        DeliveryMethodRow()
+                    } header: {
+                        Text("Advanced", bundle: .module)
+                    }
+                    .tint(tintColor)
+                    .listRowBackground(backgroundColors.tertiary)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
-                .animation(.default, value: store.appSettings.backgroundNotifications2)
+//                .animation(.default, value: store.appSettings.backgroundNotifications2)
                 .scrollContentBackground(.hidden)
             }
             .navigationTitle(Text("Notifications", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
+            .alert($store.scope(\.$alert, action: \.alert))
             .sheet(item: $store.logURL, id: \.self) { url in
                 WithPerceptionTracking {
                     ShareActivityView(url: url, onDismiss: { _ in })
@@ -131,6 +132,47 @@ public struct NotificationsScreen: View {
         .disabled(!store.areNotificationsEnabled)
         .frame(minHeight: 60)
     }
+    
+    @ViewBuilder
+    private func DeliveryMethodRow() -> some View {
+        HStack(spacing: 0) {
+            VStack(alignment: .leading) {
+                Text("Delivery method", bundle: .module)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text("Restart required", bundle: .module)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer(minLength: 8)
+            
+            Menu {
+                Picker(
+                    String(),
+                    selection: Binding(
+                        get: { store.appSettings.notificationsDeliveryMethod },
+                        set: { store.send(.notificationDeliveryMethodChanged($0)) }
+                    )
+                ) {
+                    ForEach(NotificationsDeliveryMethod.allCases) { method in
+                        Text(method.title)
+                            .tag(method)
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                HStack(spacing: 9) {
+                    Text(store.appSettings.notificationsDeliveryMethod.title)
+                    Image(systemSymbol: .chevronUpChevronDown)
+                }
+                .foregroundStyle(Color(.Labels.teritary))
+            }
+        }
+        .disabled(!store.areNotificationsEnabled)
+        .frame(minHeight: 60)
+    }
 
     private func optionBinding(_ option: NotificationsSettings2) -> Binding<Bool> {
         Binding(
@@ -151,6 +193,17 @@ extension NotificationsSettings2.FavoritesMode {
             LocalizedStringResource("Only important", bundle: .module)
         case .disabled:
             LocalizedStringResource("Do not", bundle: .module)
+        }
+    }
+}
+
+extension NotificationsDeliveryMethod {
+    var title: LocalizedStringResource {
+        switch self {
+        case .push:
+            LocalizedStringResource("Push", bundle: .module)
+        case .background:
+            LocalizedStringResource("Background", bundle: .module)
         }
     }
 }

@@ -72,7 +72,9 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 // Stream should be created before .run so we don't miss any delegate calls
                 let userNotificationsStream = notificationsClient.delegate()
                 
-                return .run { send in
+                let deliveryMethod = state.appSettings.notificationsDeliveryMethod
+                
+                return .run { [isLoggedIn = state.userSession != nil] send in
                     await withThrowingTaskGroup(of: Void.self) { group in
                         group.addTask {
                             for await notification in userNotificationsStream {
@@ -83,11 +85,23 @@ public struct AppDelegateFeature: Reducer, Sendable {
                         group.addTask {
                             let granted = try await notificationsClient.requestPermission()
                             if granted {
-                                logger.info("Notifications permission are granted")
+                                logger.info("Notifications permission is granted")
                             } else {
-                                logger.error("Notifications permission are not granted")
+                                logger.error("Notifications permission is not granted")
                             }
-                            if granted { await notificationsClient.registerForRemoteNotifications() }
+                            
+                            switch deliveryMethod {
+                            case .push:
+                                await notificationsClient.registerForRemoteNotifications()
+                            case .background:
+                                await notificationsClient.unregisterForRemoteNotifications()
+                                guard isLoggedIn else { return }
+                                @Shared(.appStorage(AppStorageKeys.deviceToken)) var deviceToken: String?
+                                if let deviceToken {
+                                    let status = try await apiClient.notify(token: deviceToken, settings: .disabled, isDebug: isDebug)
+                                    logger.info("Push notifications initialized with status `\(status)` and disabled settings")
+                                }
+                            }
                         }
                         
                         group.addTask {
@@ -105,12 +119,16 @@ public struct AppDelegateFeature: Reducer, Sendable {
                     }
                 }
                 
-            case let .didRegisterForRemoteNotifications(deviceToken):
-                let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+            case let .didRegisterForRemoteNotifications(deviceTokenData):
+                let token = deviceTokenData.map { String(format: "%02.2hhx", $0) }.joined()
+                
+                @Shared(.appStorage(AppStorageKeys.deviceToken)) var deviceToken: String?
+                $deviceToken.withLock { $0 = token }
+                
                 analyticsClient.registerPushNotificationToken(token)
-                notificationsClient.setDeviceToken(token)
+                
                 guard state.userSession != nil else { return .none }
-                return .run { [settings = state.appSettings.notifications2, isDebug = isDebug] send in
+                return .run { [settings = state.appSettings.notifications2] send in
                     let status = try await apiClient.notify(token, settings, isDebug)
                     logger.info("Push notifications initialized with status `\(status)` and settings `\(settings.rawValue)`")
                 }
@@ -129,14 +147,4 @@ public struct AppDelegateFeature: Reducer, Sendable {
             }
         }
     }
-}
-
-// MARK: - Helpers
-
-private var isDebug: Bool {
-    #if DEBUG
-        return true
-    #else
-        return false
-    #endif
 }

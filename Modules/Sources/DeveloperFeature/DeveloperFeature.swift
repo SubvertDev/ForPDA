@@ -27,7 +27,7 @@ public struct DeveloperFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) public var appSettings: AppSettings
-        @Shared(.appStorage("analytics_id")) var analyticsId: String = UUID().uuidString
+        @Shared(.appStorage(AppStorageKeys.analyticsId)) var analyticsId: String = UUID().uuidString
         
         public var backgroundTaskEntries: [BackgroundTaskEntry] = []
         public var isAnalyticsEnabled: Bool
