@@ -49,19 +49,20 @@ public struct SearchResultScreen: View {
                 
                 if !store.isLoading {
                     if !store.content.isEmpty {
-                        List {
-                            if shouldShowInlineNavigation {
-                                Navigation()
+                        ScrollView {
+                            LazyVStack(spacing: 0) {
+                                if shouldShowInlineNavigation {
+                                    Navigation()
+                                }
+
+                                ContentSection()
+
+                                if shouldShowInlineNavigation {
+                                    Navigation()
+                                }
                             }
-                            
-                            ContentSection()
-                            
-                            if shouldShowInlineNavigation {
-                                Navigation()
-                            }
+                            .frame(maxWidth: .infinity)
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
                         ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                     } else {
                         NothingFound()
@@ -116,19 +117,28 @@ public struct SearchResultScreen: View {
     // MARK: - Search Content Section
     
     private func ContentSection() -> some View {
-        Section {
-            ForEach(Array(store.content.enumerated()), id: \.element) { index, type in
+        LazyVStack(spacing: 0) {
+            ForEach(Array(store.content.enumerated()), id: \.offset) { index, type in
                 switch type {
                 case .post(let post):
-                    PostRow(post)
+                    VStack(spacing: 0) {
+                        PostRow(post)
+                            .padding(.horizontal, 16)
+                            .background(post.colorMask(backgroundColors: backgroundColors))
+
+                        PostSeparator()
+                    }
+                    
                 case .topic(let topic):
                     TopicRow(index, topic)
+                        .padding(.horizontal, 16)
+                    
                 case .article(let article):
                     ArticleRow(article)
+                        .padding(.horizontal, 16)
                 }
             }
         }
-        .padding(.horizontal, 16)
     }
     
     // MARK: - Post Row
@@ -175,10 +185,16 @@ public struct SearchResultScreen: View {
                 )
             }
         }
-        .padding(.vertical, 12)
-        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(post.colorMask(backgroundColors: backgroundColors))
+        .padding(.top, 12)
+        .padding(.bottom, 16)
         .disabled(post.topicName.isEmpty && post.isDisabled)
+    }
+
+    @ViewBuilder
+    private func PostSeparator() -> some View {
+        Rectangle()
+            .foregroundStyle(backgroundColors.tertiary)
+            .frame(height: 10)
     }
     
     // MARK: - Topic Row
@@ -210,9 +226,7 @@ public struct SearchResultScreen: View {
                         )
                 )
             }
-            .listSectionSeparator(.hidden)
-            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(backgroundColors.primary)
+            .background(backgroundColors.primary)
         }
     }
     
@@ -241,9 +255,7 @@ public struct SearchResultScreen: View {
         }
         .buttonStyle(.plain)
         .padding(.bottom, 14)
-        .listRowSeparator(.hidden)
-        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(backgroundColors.primary)
+        .background(backgroundColors.primary)
     }
     
     private func settingsToRow(_ rowType: AppSettings.ArticleListRowType) -> ArticleRowView.RowType {
@@ -255,7 +267,9 @@ public struct SearchResultScreen: View {
     @ViewBuilder
     private func Navigation() -> some View {
         PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
-            .listRowBackground(backgroundColors.primary)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(backgroundColors.primary)
     }
     
     // MARK: - Nothing Found
