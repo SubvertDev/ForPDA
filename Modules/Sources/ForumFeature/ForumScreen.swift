@@ -140,16 +140,6 @@ public struct ForumScreen: View {
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
-                .foregroundStyle(foregroundStyle())
-        }
-    }
-    
-    @available(iOS, deprecated: 26.0)
-    private func foregroundStyle() -> AnyShapeStyle {
-        if isLiquidGlass {
-            return AnyShapeStyle(.foreground)
-        } else {
-            return AnyShapeStyle(tintColor)
         }
     }
     
@@ -518,7 +508,6 @@ public struct ForumScreen: View {
                         send(.searchButtonTapped)
                     } label: {
                         Image(systemSymbol: .magnifyingglass)
-                            .foregroundStyle(foregroundStyle())
                     }
                 }
                 
@@ -540,7 +529,6 @@ public struct ForumScreen: View {
                             Text("Cancel", bundle: .module)
                         }
                     }
-                    .foregroundStyle(foregroundStyle())
                 }
                 
                 ToolbarItem {
@@ -554,7 +542,9 @@ public struct ForumScreen: View {
                     } label: {
                         Image(systemSymbol: .ellipsisCircle)
                             .foregroundStyle(
-                                store.isMultiSelectionMenuDisabled ? AnyShapeStyle(Color(.Labels.teritary)) : foregroundStyle()
+                                store.isMultiSelectionMenuDisabled
+                                ? Color(.Labels.teritary)
+                                : tintColor
                             )
                     }
                     .disabled(store.isMultiSelectionMenuDisabled)

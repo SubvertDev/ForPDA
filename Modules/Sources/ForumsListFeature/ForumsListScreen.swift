@@ -74,7 +74,6 @@ public struct ForumsListScreen: View {
                     send(.searchButtonTapped)
                 } label: {
                     Image(systemSymbol: .magnifyingglass)
-                        .foregroundStyle(foregroundStyle())
                 }
             }
             .onAppear {
@@ -105,17 +104,6 @@ public struct ForumsListScreen: View {
                     .rotationEffect(.degrees(store.isExpanded[forumRow.id]! ? 0 : -180))
                     .offset(x: 16)
             }
-        }
-    }
-    
-    // MARK: - Helpers
-    
-    @available(iOS, deprecated: 26.0)
-    private func foregroundStyle() -> AnyShapeStyle {
-        if isLiquidGlass {
-            return AnyShapeStyle(.foreground)
-        } else {
-            return AnyShapeStyle(tintColor)
         }
     }
 }

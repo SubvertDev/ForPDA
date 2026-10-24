@@ -148,7 +148,6 @@ public struct TopicScreen: View {
                             send(.searchButtonTapped)
                         } label: {
                             Image(systemSymbol: .magnifyingglass)
-                                .foregroundStyle(foregroundStyle())
                         }
                     }
                     
@@ -263,7 +262,6 @@ public struct TopicScreen: View {
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
-                .foregroundStyle(foregroundStyle())
         }
     }
     
@@ -307,15 +305,6 @@ public struct TopicScreen: View {
                 Text("Tools", bundle: .module)
                 Image(systemSymbol: .shield)
             }
-        }
-    }
-    
-    @available(iOS, deprecated: 26.0)
-    private func foregroundStyle() -> AnyShapeStyle {
-        if isLiquidGlass {
-            return AnyShapeStyle(.foreground)
-        } else {
-            return AnyShapeStyle(tintColor)
         }
     }
     
