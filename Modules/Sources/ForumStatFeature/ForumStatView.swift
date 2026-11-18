@@ -29,45 +29,49 @@ public struct ForumStatView: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            ScrollView {
-                VStack(spacing: 0) {
-                    if !store.isLoading {
-                        switch store.type {
-                        case .forum:
-                            if let stat = store.stat {
-                                ForumStat(stat)
+            ZStack {
+                backgroundColors.primary
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 0) {
+                        if !store.isLoading {
+                            switch store.type {
+                            case .forum:
+                                if let stat = store.stat {
+                                    ForumStat(stat)
+                                }
+                            case .topic(let topic):
+                                TopicStat(topic)
                             }
-                        case .topic(let topic):
-                            TopicStat(topic)
                         }
                     }
+                    .padding(16)
+                    .navigationBarTitleDisplayMode(.inline)
                 }
-                .padding(16)
-                .navigationBarTitleDisplayMode(.inline)
-            } 
-            .sheet(item: $store.scope(\.$destination, action: \.destination).share) { value in
-                ShareActivityView(url: value.url) { _ in
-                    send(.linkShared)
+                .sheet(item: $store.scope(\.$destination, action: \.destination).share) { value in
+                    ShareActivityView(url: value.url) { _ in
+                        send(.linkShared)
+                    }
+                    .presentationDetents([.medium])
                 }
-                .presentationDetents([.medium])
-            }
-            .background(backgroundColors.primary)
-            .safeAreaInset(edge: .bottom) {
-                if case let .topic(topic) = store.type, topic.canModerate {
-                    OpenTopicHistoryButton()
+                .safeAreaInset(edge: .bottom) {
+                    if case let .topic(topic) = store.type, topic.canModerate {
+                        OpenTopicHistoryButton()
+                    }
                 }
-            }
-            .toolbar {
-                Toolbar()
-            }
-            .overlay {
-                if store.isLoading, store.stat == nil {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
+                .toolbar {
+                    Toolbar()
                 }
-            }
-            .onAppear {
-                send(.onAppear)
+                .overlay {
+                    if store.isLoading, store.stat == nil {
+                        PDALoader()
+                            .frame(width: 24, height: 24)
+                    }
+                }
+                .onAppear {
+                    send(.onAppear)
+                }
             }
         }
     }
