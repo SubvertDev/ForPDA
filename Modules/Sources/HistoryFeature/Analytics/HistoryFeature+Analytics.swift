@@ -19,7 +19,7 @@ extension HistoryFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .delegate:
+                case .view(.onFirstAppear), .delegate:
                     break
                     
                 case .pageNavigation(.offsetChanged(to: _)):
@@ -35,11 +35,16 @@ extension HistoryFeature {
                 case .pageNavigation:
                     break
                     
+                case .view(.onRefresh):
+                    analytics.log(HistoryEvent.onRefresh)
+                    
                 case let .view(.topicTapped(topic, showUnread)):
                     analytics.log(HistoryEvent.topicTapped(topic.id, topic.name, showUnread))
                     
-                case .internal(.loadHistory(offset: _)),
-                        .internal(.historyResponse(_)):
+                case .internal(.refresh),
+                     .internal(.loadHistory),
+                     .internal(.historyResponse),
+                     .internal(.markRead):
                     break
                 }
                 

@@ -10,7 +10,7 @@ import Models
 
 public struct HistoryRow: Hashable {
     public let seenDate: Date
-    public let topics: [TopicInfo]
+    public var topics: [TopicInfo]
     
     public init(seenDate: Date, topics: [TopicInfo]) {
         self.seenDate = seenDate

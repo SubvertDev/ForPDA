@@ -8,6 +8,7 @@
 import Foundation
 
 public enum HistoryEvent: Event {
+    case onRefresh
     case topicTapped(Int, String, Bool)
     
     public var name: String {
@@ -22,6 +23,9 @@ public enum HistoryEvent: Event {
                 "name": name,
                 "show_unread": String(showUnread)
             ]
+            
+        default:
+            return nil
         }
     }
 }

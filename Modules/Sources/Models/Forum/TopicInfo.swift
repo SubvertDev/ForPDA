@@ -12,7 +12,7 @@ public struct TopicInfo: Sendable, Hashable, Codable, Identifiable {
     public let id: Int
     public let name: String
     public let description: String
-    public let flag: ForumFlag
+    public var flag: ForumFlag
     public let postsCount: Int
     public let lastPost: LastPost
     

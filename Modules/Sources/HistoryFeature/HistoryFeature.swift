@@ -25,10 +25,9 @@ public struct HistoryFeature: Reducer, Sendable {
         
         public var history: [HistoryRow] = []
         public var isLoading = false
+        public var isRefreshing = false
         
         public var pageNavigation = PageNavigationFeature.State(type: .history)
-        
-        var offset = 0
         
         public init(
             history: [HistoryRow] = []
@@ -44,14 +43,19 @@ public struct HistoryFeature: Reducer, Sendable {
 
         case view(View)
         public enum View {
-            case onAppear
+            case onFirstAppear
+            case onRefresh
+            
             case topicTapped(TopicInfo, showUnread: Bool)
         }
         
         case `internal`(Internal)
         public enum Internal {
-            case historyResponse(Result<History, any Error>)
+            case refresh
             case loadHistory(offset: Int)
+            case historyResponse(Result<History, any Error>)
+            
+            case markRead(topic: TopicInfo)
         }
 
         case delegate(Delegate)
@@ -74,41 +78,49 @@ public struct HistoryFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .view(.onAppear):
-                return .send(.internal(.loadHistory(offset: state.offset)))
-                
             case let .pageNavigation(.offsetChanged(to: newOffset)):
-                state.offset = newOffset
                 return .send(.internal(.loadHistory(offset: newOffset)))
                 
-            case .pageNavigation:
+            case .pageNavigation, .delegate:
                 return .none
                 
+            case .view(.onFirstAppear):
+                return .send(.internal(.loadHistory(offset: 0)))
+                
+            case .view(.onRefresh):
+                guard !state.isLoading else { return .none }
+                return .send(.internal(.refresh))
+                
             case let .view(.topicTapped(topic, showUnread)):
-                guard !showUnread else {
-                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
+                return .run { [goTo = state.appSettings.topicOpeningStrategy.asGoTo] send in
+                    if showUnread {
+                        await send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
+                    } else {
+                        await send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
+                    }
+                    if topic.isUnread { await send(.internal(.markRead(topic: topic))) }
                 }
-                let goTo = state.appSettings.topicOpeningStrategy.asGoTo
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
+                
+            case let .internal(.refresh):
+                state.isRefreshing = true
+                return .send(.internal(.loadHistory(offset: state.pageNavigation.offset)))
                 
             case let .internal(.loadHistory(offset)):
-                state.isLoading = true
+                if !state.isRefreshing {
+                    state.isLoading = true
+                }
                 return .run { [perPage = state.appSettings.historyPerPage] send in
-                    let result = await Result {
-                        try await apiClient.getHistory(offset, perPage)
-                    }
-                    await send(.internal(.historyResponse(result)))
+                    let response = try await apiClient.getHistory(offset, perPage)
+                    await send(.internal(.historyResponse(.success(response))))
+                } catch: { error, send in
+                    await send(.internal(.historyResponse(.failure(error))))
                 }
                 
             case let .internal(.historyResponse(.success(response))):
                 var groupedHistories: [Date: [TopicInfo]] = [:]
                 
-                let calendar = Calendar.current
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
-                
                 for history in response.histories {
-                    let dateWithoutTime = calendar.startOfDay(for: history.seenDate)
+                    let dateWithoutTime = Calendar.current.startOfDay(for: history.seenDate)
                     
                     if groupedHistories[dateWithoutTime] != nil {
                         groupedHistories[dateWithoutTime]?.append(history.topic)
@@ -130,6 +142,7 @@ public struct HistoryFeature: Reducer, Sendable {
                 state.pageNavigation.count = response.historiesCount
                 
                 state.isLoading = false
+                state.isRefreshing = false
                 analyticsClient.reportFullyDisplayed()
                 return .none
                 
@@ -139,7 +152,12 @@ public struct HistoryFeature: Reducer, Sendable {
                 analyticsClient.reportFullyDisplayed()
                 return .none
                 
-            case .delegate:
+            case let .internal(.markRead(topic)):
+                guard let rowIndex = state.history.firstIndex(where: { $0.topics.contains(topic) }),
+                      let topicIndex = state.history[rowIndex].topics.firstIndex(of: topic) else {
+                    return .none
+                }
+                state.history[rowIndex].topics[topicIndex].flag.remove(.updated)
                 return .none
             }
         }
