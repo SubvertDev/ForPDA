@@ -88,7 +88,7 @@ public struct TopicRow: View {
                 
                 HStack(spacing: 0) {
                     if hasHatUpdateTracking {
-                        Image(systemSymbol: .bellFill)
+                        Image(systemSymbol: .flagFill)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 16, height: 16)
