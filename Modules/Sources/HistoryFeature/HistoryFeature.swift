@@ -93,15 +93,11 @@ public struct HistoryFeature: Reducer, Sendable {
                 
             case let .view(.topicTapped(topic, showUnread)):
                 return .run { [goTo = state.appSettings.topicOpeningStrategy.asGoTo] send in
-                    if showUnread {
-                        await send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
-                    } else {
-                        await send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
-                    }
+                    await send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: showUnread ? .unread : goTo)))
                     if topic.isUnread { await send(.internal(.markRead(topic: topic))) }
                 }
                 
-            case let .internal(.refresh):
+            case .internal(.refresh):
                 state.isRefreshing = true
                 return .send(.internal(.loadHistory(offset: state.pageNavigation.offset)))
                 

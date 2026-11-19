@@ -45,31 +45,32 @@ public struct HistoryScreen: View {
                 backgroundColors.primary
                     .ignoresSafeArea()
                 
-                List {
-                    if !store.history.isEmpty, !store.isLoading {
-                        Navigation()
-                        
-                        ForEach(store.history, id: \.self) { history in
-                            HistorySection(history: history)
+                if !store.isLoading, !store.history.isEmpty {
+                    List {
+                        if !store.history.isEmpty, !store.isLoading {
+                            Navigation()
+                            
+                            ForEach(store.history, id: \.self) { history in
+                                HistorySection(history: history)
+                            }
+                            
+                            Navigation()
                         }
-                        
-                        Navigation()
                     }
-                }
-                .scrollContentBackground(.hidden)
-                ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
-                .overlay(alignment: .center) {
-                    if !store.isLoading, store.history.isEmpty {
-                        EmptyHistory()
+                    .scrollContentBackground(.hidden)
+                    .scrollDismissesKeyboard(.immediately)
+                    ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
+                    .refreshable {
+                        await send(.onRefresh).finish()
                     }
+                } else {
+                    PDALoader()
+                        .frame(width: 24, height: 24)
                 }
             }
             .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
-            .refreshable {
-                await send(.onRefresh).finish()
-            }
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
@@ -78,12 +79,6 @@ public struct HistoryScreen: View {
                     )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
-                }
-            }
-            .overlay {
-                if store.isLoading {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
                 }
             }
             .onFirstAppear {
