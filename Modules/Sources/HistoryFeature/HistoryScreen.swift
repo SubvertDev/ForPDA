@@ -66,6 +66,7 @@ public struct HistoryScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
+            .animation(.default, value: store.isRefreshing)
             .animation(.default, value: store.history.count) // .count fix List position after click on topic
             .navigationTitle(Text("History", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
