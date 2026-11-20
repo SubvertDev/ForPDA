@@ -47,15 +47,13 @@ public struct HistoryScreen: View {
                 
                 if !store.isLoading, !store.history.isEmpty {
                     List {
-                        if !store.history.isEmpty, !store.isLoading {
-                            Navigation()
-                            
-                            ForEach(store.history, id: \.self) { history in
-                                HistorySection(history: history)
-                            }
-                            
-                            Navigation()
+                        Navigation()
+                        
+                        ForEach(store.history, id: \.self) { history in
+                            HistorySection(history: history)
                         }
+                        
+                        Navigation()
                     }
                     .scrollContentBackground(.hidden)
                     .scrollDismissesKeyboard(.immediately)
